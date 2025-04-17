@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",              // hoặc "ES6"
+    "module": "CommonJS",            // Sử dụng CommonJS nếu chạy trên Node.js
+    "moduleResolution": "node",      // giúp TypeScript hiểu các module từ Node.js
+    "esModuleInterop": true,         // Cho phép sử dụng `import` với các module không phải ES
+    "skipLibCheck": true,            // Bỏ qua kiểm tra các loại trong thư viện
+    "forceConsistentCasingInFileNames": true,  // Kiểm tra chính xác tên file
+    "outDir": "./dist",              // Dựng mã TypeScript vào thư mục dist
+    "rootDir": "./src",              // Thư mục gốc của mã nguồn
+    "resolveJsonModule": true,        // Hỗ trợ import file JSON
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
+  },
+  "include": [
+    "src/**/*.ts"
+  ]
+}
