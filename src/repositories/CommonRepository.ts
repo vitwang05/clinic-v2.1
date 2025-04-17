@@ -1,4 +1,4 @@
-import { Repository, DataSource, ObjectLiteral } from 'typeorm';
+import { Repository, DataSource, ObjectLiteral, FindOptionsWhere } from 'typeorm';
 
 export class CommonRepository<T extends ObjectLiteral> {
     private repository: Repository<T>;
@@ -11,8 +11,8 @@ export class CommonRepository<T extends ObjectLiteral> {
         return this.repository.find();
     }
 
-    async findOne(id: number): Promise<T | null> {
-        return this.repository.findOneBy({ id } as any);
+    async findOne(id: number | FindOptionsWhere<T>): Promise<T | null> {
+        return this.repository.findOneBy(id as any);
     }
 
     async save(entity: T): Promise<T> {
