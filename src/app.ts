@@ -10,7 +10,10 @@ import * as dotenv from 'dotenv';
 import { errorMiddleware } from './middlewares/error.middleware';
 import departmentRoutes from './routes/v1/departmentRoutes';
 import positionRoutes from "./routes/v1/positionRoutes";
-
+import employeeRoutes from "./routes/v1/employeeRoutes";
+import patientRoutes from "./routes/v1/patientRoutes";
+import employeeShiftRoutes from './routes/v1/employeeShiftRoutes';
+import shiftRoutes from './routes/v1/shiftRoutes';
 dotenv.config();
 
 const app = express();
@@ -25,9 +28,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Routes
 app.use('/api/v1/departments', departmentRoutes);
 app.use('/api/v1/positions', positionRoutes);
+app.use('/api/v1/employees', employeeRoutes);
+app.use('/api/v1/patients', patientRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/auth', authRoutes);
-
+app.use('/api/v1/shifts', shiftRoutes);
+app.use('/api/v1/employee-shifts', employeeShiftRoutes);
 
 app.use(errorMiddleware);
 
