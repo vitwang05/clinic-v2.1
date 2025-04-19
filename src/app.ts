@@ -14,7 +14,9 @@ import employeeRoutes from "./routes/v1/employeeRoutes";
 import patientRoutes from "./routes/v1/patientRoutes";
 import employeeShiftRoutes from './routes/v1/employeeShiftRoutes';
 import shiftRoutes from './routes/v1/shiftRoutes';
+import timeFrameRoutes from './routes/v1/timeFrameRoutes';
 dotenv.config();
+
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -34,6 +36,7 @@ app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/shifts', shiftRoutes);
 app.use('/api/v1/employee-shifts', employeeShiftRoutes);
+app.use('/api/v1/timeFrames', timeFrameRoutes);
 
 app.use(errorMiddleware);
 

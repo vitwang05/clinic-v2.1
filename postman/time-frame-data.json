@@ -1,0 +1,284 @@
+{
+    "timeFrames": [
+        {
+            "timeFrameName": "07:00 - 07:15",
+            "startTime": "07:00:00",
+            "endTime": "07:15:00"
+        },
+        {
+            "timeFrameName": "07:15 - 07:30",
+            "startTime": "07:15:00",
+            "endTime": "07:30:00"
+        },
+        {
+            "timeFrameName": "07:30 - 07:45",
+            "startTime": "07:30:00",
+            "endTime": "07:45:00"
+        },
+        {
+            "timeFrameName": "07:45 - 08:00",
+            "startTime": "07:45:00",
+            "endTime": "08:00:00"
+        },
+        {
+            "timeFrameName": "08:00 - 08:15",
+            "startTime": "08:00:00",
+            "endTime": "08:15:00"
+        },
+        {
+            "timeFrameName": "08:15 - 08:30",
+            "startTime": "08:15:00",
+            "endTime": "08:30:00"
+        },
+        {
+            "timeFrameName": "08:30 - 08:45",
+            "startTime": "08:30:00",
+            "endTime": "08:45:00"
+        },
+        {
+            "timeFrameName": "08:45 - 09:00",
+            "startTime": "08:45:00",
+            "endTime": "09:00:00"
+        },
+        {
+            "timeFrameName": "09:00 - 09:15",
+            "startTime": "09:00:00",
+            "endTime": "09:15:00"
+        },
+        {
+            "timeFrameName": "09:15 - 09:30",
+            "startTime": "09:15:00",
+            "endTime": "09:30:00"
+        },
+        {
+            "timeFrameName": "09:30 - 09:45",
+            "startTime": "09:30:00",
+            "endTime": "09:45:00"
+        },
+        {
+            "timeFrameName": "09:45 - 10:00",
+            "startTime": "09:45:00",
+            "endTime": "10:00:00"
+        },
+        {
+            "timeFrameName": "10:00 - 10:15",
+            "startTime": "10:00:00",
+            "endTime": "10:15:00"
+        },
+        {
+            "timeFrameName": "10:15 - 10:30",
+            "startTime": "10:15:00",
+            "endTime": "10:30:00"
+        },
+        {
+            "timeFrameName": "10:30 - 10:45",
+            "startTime": "10:30:00",
+            "endTime": "10:45:00"
+        },
+        {
+            "timeFrameName": "10:45 - 11:00",
+            "startTime": "10:45:00",
+            "endTime": "11:00:00"
+        },
+        {
+            "timeFrameName": "11:00 - 11:15",
+            "startTime": "11:00:00",
+            "endTime": "11:15:00"
+        },
+        {
+            "timeFrameName": "11:15 - 11:30",
+            "startTime": "11:15:00",
+            "endTime": "11:30:00"
+        },
+        {
+            "timeFrameName": "11:30 - 11:45",
+            "startTime": "11:30:00",
+            "endTime": "11:45:00"
+        },
+        {
+            "timeFrameName": "11:45 - 12:00",
+            "startTime": "11:45:00",
+            "endTime": "12:00:00"
+        },
+        {
+            "timeFrameName": "12:00 - 12:15",
+            "startTime": "12:00:00",
+            "endTime": "12:15:00"
+        },
+        {
+            "timeFrameName": "12:15 - 12:30",
+            "startTime": "12:15:00",
+            "endTime": "12:30:00"
+        },
+        {
+            "timeFrameName": "12:30 - 12:45",
+            "startTime": "12:30:00",
+            "endTime": "12:45:00"
+        },
+        {
+            "timeFrameName": "12:45 - 13:00",
+            "startTime": "12:45:00",
+            "endTime": "13:00:00"
+        },
+        {
+            "timeFrameName": "13:00 - 13:15",
+            "startTime": "13:00:00",
+            "endTime": "13:15:00"
+        },
+        {
+            "timeFrameName": "13:15 - 13:30",
+            "startTime": "13:15:00",
+            "endTime": "13:30:00"
+        },
+        {
+            "timeFrameName": "13:30 - 13:45",
+            "startTime": "13:30:00",
+            "endTime": "13:45:00"
+        },
+        {
+            "timeFrameName": "13:45 - 14:00",
+            "startTime": "13:45:00",
+            "endTime": "14:00:00"
+        },
+        {
+            "timeFrameName": "14:00 - 14:15",
+            "startTime": "14:00:00",
+            "endTime": "14:15:00"
+        },
+        {
+            "timeFrameName": "14:15 - 14:30",
+            "startTime": "14:15:00",
+            "endTime": "14:30:00"
+        },
+        {
+            "timeFrameName": "14:30 - 14:45",
+            "startTime": "14:30:00",
+            "endTime": "14:45:00"
+        },
+        {
+            "timeFrameName": "14:45 - 15:00",
+            "startTime": "14:45:00",
+            "endTime": "15:00:00"
+        },
+        {
+            "timeFrameName": "15:00 - 15:15",
+            "startTime": "15:00:00",
+            "endTime": "15:15:00"
+        },
+        {
+            "timeFrameName": "15:15 - 15:30",
+            "startTime": "15:15:00",
+            "endTime": "15:30:00"
+        },
+        {
+            "timeFrameName": "15:30 - 15:45",
+            "startTime": "15:30:00",
+            "endTime": "15:45:00"
+        },
+        {
+            "timeFrameName": "15:45 - 16:00",
+            "startTime": "15:45:00",
+            "endTime": "16:00:00"
+        },
+        {
+            "timeFrameName": "16:00 - 16:15",
+            "startTime": "16:00:00",
+            "endTime": "16:15:00"
+        },
+        {
+            "timeFrameName": "16:15 - 16:30",
+            "startTime": "16:15:00",
+            "endTime": "16:30:00"
+        },
+        {
+            "timeFrameName": "16:30 - 16:45",
+            "startTime": "16:30:00",
+            "endTime": "16:45:00"
+        },
+        {
+            "timeFrameName": "16:45 - 17:00",
+            "startTime": "16:45:00",
+            "endTime": "17:00:00"
+        },
+        {
+            "timeFrameName": "17:00 - 17:15",
+            "startTime": "17:00:00",
+            "endTime": "17:15:00"
+        },
+        {
+            "timeFrameName": "17:15 - 17:30",
+            "startTime": "17:15:00",
+            "endTime": "17:30:00"
+        },
+        {
+            "timeFrameName": "17:30 - 17:45",
+            "startTime": "17:30:00",
+            "endTime": "17:45:00"
+        },
+        {
+            "timeFrameName": "17:45 - 18:00",
+            "startTime": "17:45:00",
+            "endTime": "18:00:00"
+        },
+        {
+            "timeFrameName": "18:00 - 18:15",
+            "startTime": "18:00:00",
+            "endTime": "18:15:00"
+        },
+        {
+            "timeFrameName": "18:15 - 18:30",
+            "startTime": "18:15:00",
+            "endTime": "18:30:00"
+        },
+        {
+            "timeFrameName": "18:30 - 18:45",
+            "startTime": "18:30:00",
+            "endTime": "18:45:00"
+        },
+        {
+            "timeFrameName": "18:45 - 19:00",
+            "startTime": "18:45:00",
+            "endTime": "19:00:00"
+        },
+        {
+            "timeFrameName": "19:00 - 19:15",
+            "startTime": "19:00:00",
+            "endTime": "19:15:00"
+        },
+        {
+            "timeFrameName": "19:15 - 19:30",
+            "startTime": "19:15:00",
+            "endTime": "19:30:00"
+        },
+        {
+            "timeFrameName": "19:30 - 19:45",
+            "startTime": "19:30:00",
+            "endTime": "19:45:00"
+        },
+        {
+            "timeFrameName": "19:45 - 20:00",
+            "startTime": "19:45:00",
+            "endTime": "20:00:00"
+        },
+        {
+            "timeFrameName": "20:00 - 20:15",
+            "startTime": "20:00:00",
+            "endTime": "20:15:00"
+        },
+        {
+            "timeFrameName": "20:15 - 20:30",
+            "startTime": "20:15:00",
+            "endTime": "20:30:00"
+        },
+        {
+            "timeFrameName": "20:30 - 20:45",
+            "startTime": "20:30:00",
+            "endTime": "20:45:00"
+        },
+        {
+            "timeFrameName": "20:45 - 21:00",
+            "startTime": "20:45:00",
+            "endTime": "21:00:00"
+        }
+    ]
+} 

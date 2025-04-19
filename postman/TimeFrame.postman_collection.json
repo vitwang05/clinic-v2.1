@@ -1,0 +1,116 @@
+{
+	"info": {
+		"_postman_id": "time-frame-collection",
+		"name": "Time Frame API",
+		"description": "Collection of API endpoints for managing time frames",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get All Time Frames",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/time-frames",
+					"host": ["{{base_url}}"],
+					"path": ["api", "v1", "time-frames"]
+				}
+			}
+		},
+		{
+			"name": "Get Time Frame by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/time-frames/:id",
+					"host": ["{{base_url}}"],
+					"path": ["api", "v1", "time-frames", ":id"],
+					"variable": [
+						{
+							"key": "id",
+							"value": "1",
+							"description": "Time frame ID"
+						}
+					]
+				}
+			}
+		},
+		{
+			"name": "Create Time Frame",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"timeFrameName\": \"Morning Shift\",\n    \"startTime\": \"08:00:00\",\n    \"endTime\": \"12:00:00\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v1/time-frames",
+					"host": ["{{base_url}}"],
+					"path": ["api", "v1", "time-frames"]
+				}
+			}
+		},
+		{
+			"name": "Update Time Frame",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"timeFrameName\": \"Updated Morning Shift\",\n    \"startTime\": \"09:00:00\",\n    \"endTime\": \"13:00:00\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/v1/time-frames/:id",
+					"host": ["{{base_url}}"],
+					"path": ["api", "v1", "time-frames", ":id"],
+					"variable": [
+						{
+							"key": "id",
+							"value": "1",
+							"description": "Time frame ID"
+						}
+					]
+				}
+			}
+		},
+		{
+			"name": "Delete Time Frame",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/v1/time-frames/:id",
+					"host": ["{{base_url}}"],
+					"path": ["api", "v1", "time-frames", ":id"],
+					"variable": [
+						{
+							"key": "id",
+							"value": "1",
+							"description": "Time frame ID"
+						}
+					]
+				}
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		}
+	]
+} 

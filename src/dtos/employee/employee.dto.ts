@@ -36,8 +36,8 @@ export class CreateEmployeeDTO {
     positionId!: number;
 
     @IsNumber({}, { message: 'ID người dùng phải là số' })
-    @IsNotEmpty({ message: 'ID người dùng không được để trống' })
-    userId!: number;
+    @IsOptional()
+    userId?: number;
 }
 
 export class UpdateEmployeeDTO {
