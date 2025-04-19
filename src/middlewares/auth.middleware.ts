@@ -36,7 +36,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
 export const roleMiddleware = (allowedRoles: string[]) => {
     return (req: Request, res: Response, next: NextFunction) => {
         const userRole = (req as any).user?.role.name;
-        console.log(userRole);
+
         if (!allowedRoles.includes(userRole)) {
             throw new ForbiddenException('Insufficient permissions');
         }else{

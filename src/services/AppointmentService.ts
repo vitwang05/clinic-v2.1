@@ -4,9 +4,7 @@ import { Appointments } from '../orm/entities/Appointments';
 import { Employees } from '../orm/entities/Employees';
 import { Patients } from '../orm/entities/Patients';
 import { TimeFrame } from '../orm/entities/TimeFrame';
-import { CreateAppointmentDTO } from '../dtos/appointment/appointment.dto';
-import { UpdateAppointmentDTO } from '../dtos/appointment/appointment.dto';
-import { AppointmentStatus } from '../dtos/appointment/appointment.dto';
+import { CreateAppointmentDTO, UpdateAppointmentDTO, AppointmentStatus } from '../dtos/appointment/appointment.dto';
 
 export class AppointmentService {
     private dataSource: DataSource | null = null;
@@ -24,62 +22,74 @@ export class AppointmentService {
         await this.initializationPromise;
     }
 
+    private async checkDoctorExists(doctorId: number): Promise<Employees | null> {
+        const employeeRepo = this.dataSource!.getRepository(Employees);
+        return await employeeRepo.findOne({ where: { id: doctorId } });
+    }
+
+    private async checkPatientExists(patientId: number): Promise<Patients | null> {
+        const patientRepo = this.dataSource!.getRepository(Patients);
+        return await patientRepo.findOne({ where: { id: patientId } });
+    }
+
+    private async checkTimeFrameExists(timeFrameId: number): Promise<TimeFrame | null> {
+        const timeFrameRepo = this.dataSource!.getRepository(TimeFrame);
+        return await timeFrameRepo.findOne({ where: { id: timeFrameId } });
+    }
+
+    private async checkAppointmentOverlap(doctorId: number, timeFrameId: number, date: string): Promise<boolean> {
+        const appointmentRepo = this.dataSource!.getRepository(Appointments);
+        const existing = await appointmentRepo.findOne({
+            where: {
+                doctor: { id: doctorId },
+                timeFrame: { id: timeFrameId },
+                date: date
+            }
+        });
+        return !!existing;
+    }
+
     async createAppointment(dto: CreateAppointmentDTO): Promise<Appointments> {
         await this.ensureInitialized();
-        const appointmentRepository = this.dataSource!.getRepository(Appointments);
-        const doctorRepository = this.dataSource!.getRepository(Employees);
-        const patientRepository = this.dataSource!.getRepository(Patients);
-        const timeFrameRepository = this.dataSource!.getRepository(TimeFrame);
+        const appointmentRepo = this.dataSource!.getRepository(Appointments);
 
-        // Kiểm tra bác sĩ tồn tại
-        const doctor = await doctorRepository.findOne({ where: { id: dto.doctorId } });
+        const doctor = await this.checkDoctorExists(dto.doctorId);
         if (!doctor) {
             throw new Error('Bác sĩ không tồn tại');
         }
 
-        // Kiểm tra bệnh nhân tồn tại
-        const patient = await patientRepository.findOne({ where: { id: dto.patientId } });
+        const patient = await this.checkPatientExists(dto.patientId);
         if (!patient) {
             throw new Error('Bệnh nhân không tồn tại');
         }
 
-        // Kiểm tra khung giờ tồn tại
-        const timeFrame = await timeFrameRepository.findOne({ where: { id: dto.timeFrameId } });
+        const timeFrame = await this.checkTimeFrameExists(dto.timeFrameId);
         if (!timeFrame) {
             throw new Error('Khung giờ không tồn tại');
         }
 
-        // Kiểm tra lịch khám trùng
-        const existingAppointment = await appointmentRepository.findOne({
-            where: {
-                doctor: { id: dto.doctorId },
-                timeFrame: { id: dto.timeFrameId },
-                date: dto.date
-            }
-        });
-
-        if (existingAppointment) {
+        const isOverlap = await this.checkAppointmentOverlap(dto.doctorId, dto.timeFrameId, dto.date);
+        if (isOverlap) {
             throw new Error('Khung giờ này đã được đặt');
         }
 
-        // Tạo lịch khám mới
-        const appointment = appointmentRepository.create({
-            doctor: doctor,
-            patient: patient,
-            timeFrame: timeFrame,
+        const appointment = appointmentRepo.create({
+            doctor,
+            patient,
+            timeFrame,
             date: dto.date,
             status: AppointmentStatus.PENDING,
             notes: dto.notes
         });
 
-        return appointmentRepository.save(appointment);
+        return await appointmentRepo.save(appointment);
     }
 
     async updateAppointment(id: number, dto: UpdateAppointmentDTO): Promise<Appointments | null> {
         await this.ensureInitialized();
-        const appointmentRepository = this.dataSource!.getRepository(Appointments);
+        const appointmentRepo = this.dataSource!.getRepository(Appointments);
 
-        const appointment = await appointmentRepository.findOne({
+        const appointment = await appointmentRepo.findOne({
             where: { id },
             relations: ['doctor', 'patient', 'timeFrame']
         });
@@ -88,21 +98,21 @@ export class AppointmentService {
             return null;
         }
 
-        // Cập nhật thông tin
         if (dto.status) {
             appointment.status = dto.status;
         }
+
         if (dto.notes !== undefined) {
             appointment.notes = dto.notes;
         }
 
-        return appointmentRepository.save(appointment);
+        return await appointmentRepo.save(appointment);
     }
 
     async getAppointmentById(id: number): Promise<Appointments | null> {
         await this.ensureInitialized();
-        const appointmentRepository = this.dataSource!.getRepository(Appointments);
-        return appointmentRepository.findOne({
+        const appointmentRepo = this.dataSource!.getRepository(Appointments);
+        return await appointmentRepo.findOne({
             where: { id },
             relations: ['doctor', 'patient', 'timeFrame']
         });
@@ -110,8 +120,8 @@ export class AppointmentService {
 
     async getDoctorAppointments(doctorId: number, date: string): Promise<Appointments[]> {
         await this.ensureInitialized();
-        const appointmentRepository = this.dataSource!.getRepository(Appointments);
-        return appointmentRepository.find({
+        const appointmentRepo = this.dataSource!.getRepository(Appointments);
+        return await appointmentRepo.find({
             where: {
                 doctor: { id: doctorId },
                 date: date
@@ -125,10 +135,11 @@ export class AppointmentService {
         });
     }
 
+
     async getPatientAppointments(patientId: number): Promise<Appointments[]> {
         await this.ensureInitialized();
-        const appointmentRepository = this.dataSource!.getRepository(Appointments);
-        return appointmentRepository.find({
+        const appointmentRepo = this.dataSource!.getRepository(Appointments);
+        return await appointmentRepo.find({
             where: {
                 patient: { id: patientId }
             },
@@ -141,4 +152,4 @@ export class AppointmentService {
             }
         });
     }
-} 
+}

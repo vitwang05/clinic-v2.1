@@ -5,15 +5,12 @@ import { UpdateAppointmentDTO } from '../dtos/appointment/appointment.dto';
 import { ApiResponse } from '../utils/ApiResponse';
 
 export class AppointmentController {
-    private appointmentService: AppointmentService;
-
-    constructor() {
-        this.appointmentService = new AppointmentService();
-    }
+    constructor(private appointmentService: AppointmentService) {}
 
     async createAppointment(req: Request, res: Response): Promise<void> {
         try {
             const dto: CreateAppointmentDTO = req.body;
+            console.log(dto);
             const appointment = await this.appointmentService.createAppointment(dto);
             res.status(201).json(ApiResponse.success(appointment));
         } catch (error) {
