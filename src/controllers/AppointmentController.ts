@@ -63,7 +63,7 @@ export class AppointmentController {
     }
 
     async getPatientAppointments(req: Request, res: Response): Promise<void> {
-        try {
+        try { 
             const patientId = Number(req.params.patientId);
             const appointments = await this.appointmentService.getPatientAppointments(patientId);
             res.status(200).json(ApiResponse.success(appointments));

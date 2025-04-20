@@ -5,13 +5,16 @@ import { TimeFrameRepository } from '../../repositories/TimeFrameRepository';
 import { DataSource } from 'typeorm';
 import { AppDataSource } from '../../orm/dbCreateConnection';
 import { authMiddleware, roleMiddleware } from '../../middlewares/auth.middleware';
+import { EmployeeShiftRepository } from '../../repositories/EmployeeShiftRepository';
 
 const router = Router();
 
 const initializeRouter = async () => {
-    const dataSource: DataSource = await AppDataSource();
+    const dataSource: DataSource = await AppDataSource.initialize(); // Ensure DB connection is established
+
     const timeFrameRepository = new TimeFrameRepository(dataSource);
-    const timeFrameService = new TimeFrameService(timeFrameRepository);
+    const employeeShiftRepository = new EmployeeShiftRepository(dataSource);
+    const timeFrameService = new TimeFrameService(timeFrameRepository, employeeShiftRepository);
     const timeFrameController = new TimeFrameController(timeFrameService);
 
     router.use(authMiddleware);

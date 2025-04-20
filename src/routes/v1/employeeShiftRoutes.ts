@@ -5,14 +5,17 @@ import { EmployeeShiftRepository } from '../../repositories/EmployeeShiftReposit
 import { DataSource } from 'typeorm';
 import { AppDataSource } from '../../orm/dbCreateConnection';
 import { authMiddleware, roleMiddleware } from '../../middlewares/auth.middleware';
+import { ShiftsRepository } from '../../repositories/ShiftsRepository';
 
 
 const router = Router();
 
 const initializeRouter = async () => {
-    const dataSource: DataSource = await AppDataSource();
+    const dataSource: DataSource = await AppDataSource.initialize(); // Ensure DB connection is established
+
     const employeeShiftRepository = new EmployeeShiftRepository(dataSource);
-    const employeeShiftService = new EmployeeShiftService(employeeShiftRepository);
+    const shiftsRepository = new ShiftsRepository(dataSource);
+    const employeeShiftService = new EmployeeShiftService(employeeShiftRepository, shiftsRepository);
     const employeeShiftController = new EmployeeShiftController(employeeShiftService);
     router.use(authMiddleware);
 

@@ -5,13 +5,16 @@ import { PatientsRepository } from '../../repositories/PatientsRepository';
 import { DataSource } from 'typeorm';
 import { AppDataSource } from '../../orm/dbCreateConnection';
 import { authMiddleware, roleMiddleware } from '../../middlewares/auth.middleware';
+import { UsersRepository } from '../../repositories/UsersRepository';
 
 const router = Router();
 
 const initializeRouter = async () => {
-    const dataSource: DataSource = await AppDataSource();
+    const dataSource: DataSource = await AppDataSource.initialize(); // Ensure DB connection is established
+
     const patientsRepository = new PatientsRepository(dataSource);
-    const patientsService = new PatientsService(patientsRepository);
+    const usersRepository = new UsersRepository(dataSource);
+    const patientsService = new PatientsService(patientsRepository,usersRepository);
     const patientsController = new PatientsController(patientsService);
 
     // Apply auth middleware to all routes

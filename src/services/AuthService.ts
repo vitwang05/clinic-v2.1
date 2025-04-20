@@ -1,28 +1,18 @@
 import { UsersService } from './UsersService';
+import { TokensService } from './TokensService'; // service riêng cho tokens
 import { Users } from '../orm/entities/Users';
 import { Tokens } from '../orm/entities/Tokens';
-import { DataSource } from 'typeorm';
-import { AppDataSource } from '../orm/dbCreateConnection';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { BadRequestException, UnauthorizedException } from '../exceptions';
 
 export class AuthService {
     private usersService: UsersService;
-    private dataSource: DataSource | null = null;
-    private initializationPromise: Promise<void>;
+    private tokensService: TokensService;
 
-    constructor(usersService: UsersService) {
+    constructor(usersService: UsersService, tokensService: TokensService) {
         this.usersService = usersService;
-        this.initializationPromise = this.initializeDataSource();
-    }
-
-    private async initializeDataSource() {
-        this.dataSource = await AppDataSource();
-    }
-
-    private async ensureInitialized() {
-        await this.initializationPromise;
+        this.tokensService = tokensService;
     }
 
     async register(userData: Partial<Users>): Promise<Users> {
@@ -59,8 +49,8 @@ export class AuthService {
         }
 
         const token = jwt.sign(
-            { 
-                userId: user.id, 
+            {
+                userId: user.id,
                 email: user.email,
                 role: user.role
             },
@@ -68,17 +58,13 @@ export class AuthService {
             { expiresIn: '24h' }
         );
 
-        await this.ensureInitialized();
-        const tokenRepository = this.dataSource!.getRepository(Tokens);
-        await tokenRepository.save({ token, user });
+        await this.tokensService.saveToken(token, user);
 
         return { user, token };
     }
 
     async logout(token: string): Promise<void> {
-        await this.ensureInitialized();
-        const tokenRepository = this.dataSource!.getRepository(Tokens);
-        await tokenRepository.delete({ token });
+        await this.tokensService.deleteToken(token);
     }
 
     async validateToken(token: string): Promise<Users | null> {
@@ -88,14 +74,14 @@ export class AuthService {
                 return null;
             }
 
-            await this.ensureInitialized();
-            const userRepository = this.dataSource!.getRepository(Users);
-            return userRepository.findOne({
-                where: { id: decoded.userId },
-                relations: ['role']
-            });
+            const isTokenValid = await this.tokensService.findToken(token);
+            if (!isTokenValid) {
+                return null;
+            }
+
+            return this.usersService.getUserById(decoded.userId);
         } catch (error) {
             return null;
         }
     }
-} 
+}

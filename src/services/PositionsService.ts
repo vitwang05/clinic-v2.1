@@ -12,54 +12,50 @@ export class PositionsService {
 
     constructor(positionsRepository: PositionsRepository) {
         this.positionsRepository = positionsRepository;
-        this.initializationPromise = this.initializeDataSource();
+        // this.initializationPromise = this.initializeDataSource();
     }
 
-    private async initializeDataSource() {
-        this.dataSource = await AppDataSource();
-    }
+    // private async initializeDataSource() {
+    //     this.dataSource = await AppDataSource();
+    // }
 
-    private async ensureInitialized() {
-        await this.initializationPromise;
-    }
+    // private async ensureInitialized() {
+    //     await this.initializationPromise;
+    // }
 
     async getAllPositions(): Promise<Positions[]> {
-        await this.ensureInitialized();
-        const positionRepository = this.dataSource!.getRepository(Positions);
-        return positionRepository.find({
-            relations: ['department']
-        });
+        // await this.ensureInitialized();
+        // const positionRepository = this.dataSource!.getRepository(Positions);
+        // return positionRepository.find({
+        //     relations: ['department']
+        // });
+
+        return this.positionsRepository.findWithRelations(["department"]);
     }
 
     async getPositionById(id: number): Promise<Positions | null> {
-        await this.ensureInitialized();
-        const positionRepository = this.dataSource!.getRepository(Positions);
-        return positionRepository.findOne({
-            where: { id },
-            relations: ['department']
-        });
+        return this.positionsRepository.findOneWithRelations(id,["department"]);
     }
 
     async createPosition(positionDTO: CreatePositionDTO): Promise<Positions> {
-        await this.ensureInitialized();
-        const positionRepository = this.dataSource!.getRepository(Positions);
-        const position = positionRepository.create(positionDTO);
-        return positionRepository.save(position);
+        const savedPosition = await this.positionsRepository.create(positionDTO);
+        return this.positionsRepository.save(savedPosition);
     }
 
     async updatePosition(id: number, positionDTO: UpdatePositionDTO): Promise<Positions | null> {
-        await this.ensureInitialized();
-        const positionRepository = this.dataSource!.getRepository(Positions);
-        await positionRepository.update(id, positionDTO);
-        return positionRepository.findOne({
-            where: { id },
-            relations: ['department']
-        });
+        // await this.ensureInitialized();
+        // const positionRepository = this.dataSource!.getRepository(Positions);
+        await this.positionsRepository.update(id, positionDTO);
+        // return positionRepository.findOne({
+        //     where: { id },
+        //     relations: ['department']
+        // });
+        return this.positionsRepository.findOneWithRelations(id,["department"]);
     }
 
     async deletePosition(id: number): Promise<void> {
-        await this.ensureInitialized();
-        const positionRepository = this.dataSource!.getRepository(Positions);
-        await positionRepository.delete(id);
+        // await this.ensureInitialized();
+        // const positionRepository = this.dataSource!.getRepository(Positions);
+        await this.positionsRepository.delete(id);
     }
 } 

@@ -7,24 +7,19 @@ import { DataSource } from 'typeorm';
 import { AppDataSource } from '../orm/dbCreateConnection';
 import { EmployeeShift } from '../orm/entities/EmployeeShift';
 import { Shifts } from '../orm/entities/Shifts';
+import { EmployeeShiftRepository } from '../repositories/EmployeeShiftRepository';
 
 export class TimeFrameService {
     private timeFrameRepository: TimeFrameRepository;
-    private dataSource: DataSource | null = null;
-    private initializationPromise: Promise<void>;
+    private employeeShiftRepository: EmployeeShiftRepository;
 
-    constructor(timeFrameRepository: TimeFrameRepository) {
+
+    constructor(timeFrameRepository: TimeFrameRepository,  employeeShiftRepository: EmployeeShiftRepository) {
         this.timeFrameRepository = timeFrameRepository;
-        this.initializationPromise = this.initializeDataSource();
+        this.employeeShiftRepository =employeeShiftRepository;
+      
     }
 
-    private async initializeDataSource() {
-        this.dataSource = await AppDataSource();
-    }
-
-    private async ensureInitialized() {
-        await this.initializationPromise;
-    }
 
     async getAllTimeFrames(): Promise<TimeFrame[]> {
         return this.timeFrameRepository.findAll();
@@ -63,12 +58,11 @@ export class TimeFrameService {
     }
 
     async getDoctorTimeFrames(dto: GetDoctorTimeFramesDTO): Promise<TimeFrame[]> {
-        await this.ensureInitialized();
+ 
     
-        const employeeShiftRepository = this.dataSource!.getRepository(EmployeeShift);
-        const timeFrameRepository = this.dataSource!.getRepository(TimeFrame);
+    
         // Lấy tất cả ca làm việc của bác sĩ trong ngày
-        const employeeShifts = await employeeShiftRepository.find({
+        const employeeShifts = await this.employeeShiftRepository.find({
             where: {
                 employee: { id: dto.doctorId },
                 shiftDate: dto.date
@@ -78,9 +72,7 @@ export class TimeFrameService {
         if (employeeShifts.length === 0) return [];
     
         // Lấy tất cả khung giờ
-        const allTimeFrames = await timeFrameRepository.find({
-            order: { startTime: 'ASC' }
-        });
+        const allTimeFrames = await this.timeFrameRepository.findAll();
     
         // Gom tất cả khung giờ hợp lệ
         const availableTimeFrames = allTimeFrames.filter((timeFrame) => {

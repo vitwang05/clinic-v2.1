@@ -9,7 +9,8 @@ import { authMiddleware, roleMiddleware } from '../../middlewares/auth.middlewar
 const router = Router();
 
 const initializeRouter = async () => {
-    const dataSource: DataSource = await AppDataSource();
+    const dataSource: DataSource = await AppDataSource.initialize(); // Ensure DB connection is established
+
     const positionsRepository = new PositionsRepository(dataSource);
     const positionsService = new PositionsService(positionsRepository);
     const positionsController = new PositionsController(positionsService);

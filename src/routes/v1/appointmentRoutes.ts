@@ -9,9 +9,10 @@ import { DataSource } from 'typeorm';
 const router = Router();
 
 const initializeRouter = async () => {
-    const dataSource: DataSource = await AppDataSource();
+    const dataSource: DataSource = await AppDataSource.initialize(); // Ensure DB connection is established
+
     const appointmentRepository = new AppointmentsRepository(dataSource);
-    const appointmentService = new AppointmentService();
+    const appointmentService = new AppointmentService(dataSource);
     const appointmentController = new AppointmentController(appointmentService);
 
     // Apply auth middleware to all routes

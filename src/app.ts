@@ -5,7 +5,7 @@ import authRoutes from "./routes/v1/authRoutes";
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import helmet from 'helmet';
-import { AppDataSource } from "./orm/dbCreateConnection";
+import { AppDataSource, initializeDataSource } from "./orm/dbCreateConnection";
 import * as dotenv from 'dotenv';
 import { errorMiddleware } from './middlewares/error.middleware';
 import departmentRoutes from './routes/v1/departmentRoutes';
@@ -42,10 +42,11 @@ app.use('/api/v1/appointments', appointmentRoutes);
 app.use(errorMiddleware);
 
 // Initialize database connection
-AppDataSource().then(() => {
-    console.log('Database connected');
+initializeDataSource().then(() => {  
+  console.log('Database connected');
 }).catch((error) => {
-    console.error('Database connection error:', error);
+  console.error('Database connection error:', error);
+  process.exit(1);  // Nếu không thể kết nối thì dừng server
 });
 
 app.listen(port, () => {

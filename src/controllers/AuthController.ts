@@ -10,26 +10,16 @@ import { toUserDTO } from '../dtos/auth/user.dto';
 
 export class AuthController {
     private authService: AuthService;
-    private initializationPromise: Promise<void>;
+    // private initializationPromise: Promise<void>;
 
-    constructor() {
-        this.initializationPromise = this.initialize();
-    }
-
-    private async initialize() {
-        const dataSource = await AppDataSource();
-        const usersRepository = new UsersRepository(dataSource);
-        const usersService = new UsersService(usersRepository);
-        this.authService = new AuthService(usersService);
-    }
-
-    private async ensureInitialized() {
-        await this.initializationPromise;
+    
+    constructor(authService: AuthService) {
+        this.authService = authService;
     }
 
     async register(req: Request, res: Response) {
         try {
-            await this.ensureInitialized();
+
             const registerDTO: RegisterDTO = req.body;
             const user = await this.authService.register(registerDTO);
             res.status(201).json(ApiResponse.success(toUserDTO(user)));
@@ -40,7 +30,6 @@ export class AuthController {
 
     async login(req: Request, res: Response) {
         try {
-            await this.ensureInitialized();
             const loginDTO: LoginDTO = req.body;
             const result = await this.authService.login(loginDTO.email, loginDTO.password);
             res.status(200).json(ApiResponse.success({
@@ -54,7 +43,6 @@ export class AuthController {
 
     async logout(req: Request, res: Response) {
         try {
-            await this.ensureInitialized();
             const token = req.headers.authorization?.split(' ')[1];
             if (!token) {
                 return res.status(400).json(ApiResponse.error('Token is required'));
@@ -68,7 +56,6 @@ export class AuthController {
 
     async validateToken(req: Request, res: Response) {
         try {
-            await this.ensureInitialized();
             const token = req.headers.authorization?.split(' ')[1];
             if (!token) {
                 return res.status(400).json(ApiResponse.error('Token is required'));

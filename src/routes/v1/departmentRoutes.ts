@@ -15,7 +15,7 @@ import { BadRequestException } from '../../exceptions';
 const router = Router();
 
 const initializeRouter = async () => {
-    const dataSource: DataSource = await AppDataSource();
+    const dataSource: DataSource = await AppDataSource.initialize(); // Ensure DB connection is established
     const departmentsRepository = new DepartmentsRepository(dataSource);
     const departmentsService = new DepartmentsService(departmentsRepository);
     const departmentsController = new DepartmentsController(departmentsService);
