@@ -6,6 +6,8 @@ import { DataSource } from 'typeorm';
 import { AppDataSource } from '../../orm/dbCreateConnection';
 import { authMiddleware, roleMiddleware } from '../../middlewares/auth.middleware';
 import { UsersRepository } from '../../repositories/UsersRepository';
+import { validateDTO } from '../../middlewares/validation.middleware';
+import { CreatePatientDTO, UpdatePatientDTO } from '../../dtos/patient/patient.dto';
 
 const router = Router();
 
@@ -21,8 +23,8 @@ const initializeRouter = async () => {
     router.use(authMiddleware);
 
     // Only admin can create, update, delete patients
-    router.post('/', roleMiddleware(['admin','patient']), (req, res) => patientsController.createPatient(req, res));
-    router.put('/:id', roleMiddleware(['admin']), (req, res) => patientsController.updatePatient(req, res));
+    router.post('/', roleMiddleware(['admin','patient']), validateDTO(CreatePatientDTO), (req, res) => patientsController.createPatient(req, res));
+    router.put('/:id', roleMiddleware(['admin']), validateDTO(UpdatePatientDTO), (req, res) => patientsController.updatePatient(req, res));
     router.delete('/:id', roleMiddleware(['admin']), (req, res) => patientsController.deletePatient(req, res));
 
     // All authenticated users can view patients

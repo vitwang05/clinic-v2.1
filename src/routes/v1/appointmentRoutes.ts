@@ -5,6 +5,8 @@ import { AppointmentsRepository } from '../../repositories/AppointmentRepository
 import { AppDataSource } from '../../orm/dbCreateConnection';
 import { authMiddleware, roleMiddleware } from '../../middlewares/auth.middleware';
 import { DataSource } from 'typeorm';
+import { validateDTO } from '../../middlewares/validation.middleware';
+import { CreateAppointmentDTO, UpdateAppointmentDTO } from '../../dtos/appointment/appointment.dto';
 
 const router = Router();
 
@@ -19,8 +21,8 @@ const initializeRouter = async () => {
     router.use(authMiddleware);
 
     // Only admin can create, update, delete appointments
-    router.post('/', roleMiddleware(['admin']), (req, res) => appointmentController.createAppointment(req, res));
-    router.put('/:id', roleMiddleware(['admin']), (req, res) => appointmentController.updateAppointment(req, res));
+    router.post('/', roleMiddleware(['admin']), validateDTO(CreateAppointmentDTO), (req, res) => appointmentController.createAppointment(req, res));
+    router.put('/:id', roleMiddleware(['admin']), validateDTO(UpdateAppointmentDTO), (req, res) => appointmentController.updateAppointment(req, res));
     router.get('/doctor/:doctorId/:date',roleMiddleware(['admin', 'doctor']), (req, res)=> appointmentController.getDoctorAppointments(req,res));
     router.get('/patienAppointment/:patientId', (req, res)=> appointmentController.getPatientAppointments(req,res));
     // All authenticated users can view appointments

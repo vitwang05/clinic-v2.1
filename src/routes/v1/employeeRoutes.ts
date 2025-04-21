@@ -6,6 +6,8 @@ import { DataSource } from 'typeorm';
 import { AppDataSource } from '../../orm/dbCreateConnection';
 import { authMiddleware, roleMiddleware } from '../../middlewares/auth.middleware';
 import { PositionsRepository } from '../../repositories/PositionsRepository';
+import { validateDTO } from '../../middlewares/validation.middleware';
+import { CreateEmployeeDTO, UpdateEmployeeDTO } from '../../dtos/employee/employee.dto';
 
 const     router = Router();
 
@@ -21,8 +23,8 @@ const initializeRouter = async () => {
     router.use(authMiddleware);
 
     // Only admin can create, update, delete employees
-    router.post('/', roleMiddleware(['admin']), (req, res) => employeesController.createEmployee(req, res));
-    router.put('/:id', roleMiddleware(['admin']), (req, res) => employeesController.updateEmployee(req, res));
+    router.post('/', roleMiddleware(['admin']), validateDTO(CreateEmployeeDTO), (req, res) => employeesController.createEmployee(req, res));
+    router.put('/:id', roleMiddleware(['admin']), validateDTO(UpdateEmployeeDTO),  (req, res) => employeesController.updateEmployee(req, res));
     router.delete('/:id', roleMiddleware(['admin']), (req, res) => employeesController.deleteEmployee(req, res));
 
     // All authenticated users can view employees

@@ -5,12 +5,10 @@ import { DepartmentsRepository } from '../../repositories/DepartmentsRepository'
 import { DataSource } from 'typeorm';
 import { AppDataSource } from '../../orm/dbCreateConnection';
 import { authMiddleware, roleMiddleware } from '../../middlewares/auth.middleware';
-import { requireAdmin, requireStaff } from '../../middlewares/role.middleware';
-import { validate } from 'class-validator';
-import { plainToClass } from 'class-transformer';
-import { CreateDepartmentDTO } from '../../dtos/department/department.dto';
-import { UpdateDepartmentDTO } from '../../dtos/department/department.dto';
-import { BadRequestException } from '../../exceptions';
+import { CreateDepartmentDTO, UpdateDepartmentDTO } from '../../dtos/department/department.dto';
+import { validateDTO } from '../../middlewares/validation.middleware';
+
+
 
 const router = Router();
 
@@ -24,8 +22,8 @@ const initializeRouter = async () => {
     router.use(authMiddleware);
 
     // Only admin can create, update, delete departments
-    router.post('/', roleMiddleware(['admin']), (req, res) => departmentsController.createDepartment(req, res));
-    router.put('/:id', roleMiddleware(['admin']), (req, res) => departmentsController.updateDepartment(req, res));
+    router.post('/', roleMiddleware(['admin']), validateDTO(CreateDepartmentDTO), (req, res) => departmentsController.createDepartment(req, res));
+    router.put('/:id', roleMiddleware(['admin']), validateDTO(UpdateDepartmentDTO), (req, res) => departmentsController.updateDepartment(req, res));
     router.delete('/:id', roleMiddleware(['admin']), (req, res) => departmentsController.deleteDepartment(req, res));
 
     // All authenticated users can view departments

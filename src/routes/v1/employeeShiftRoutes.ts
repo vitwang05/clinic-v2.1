@@ -6,7 +6,8 @@ import { DataSource } from 'typeorm';
 import { AppDataSource } from '../../orm/dbCreateConnection';
 import { authMiddleware, roleMiddleware } from '../../middlewares/auth.middleware';
 import { ShiftsRepository } from '../../repositories/ShiftsRepository';
-
+import { validateDTO } from '../../middlewares/validation.middleware';
+import { CreateEmployeeShiftDTO, UpdateEmployeeShiftDTO } from '../../dtos/employee-shift/employee-shift.dto';
 
 const router = Router();
 
@@ -41,10 +42,10 @@ const initializeRouter = async () => {
     router.get('/employee/:employeeId/week/:date', roleMiddleware(['admin']), (req, res) => employeeShiftController.getEmployeeShiftsByEmployeeIdAndWeek(req, res));
 
     // Tạo ca làm việc mới
-    router.post('/', roleMiddleware(['admin']), (req, res) => employeeShiftController.createEmployeeShift(req, res));
+    router.post('/', roleMiddleware(['admin']), validateDTO(CreateEmployeeShiftDTO), (req, res) => employeeShiftController.createEmployeeShift(req, res));
 
     // Cập nhật ca làm việc
-    router.put('/:id', roleMiddleware(['admin']), (req, res) => employeeShiftController.updateEmployeeShift(req, res));
+    router.put('/:id', roleMiddleware(['admin']), validateDTO(UpdateEmployeeShiftDTO), (req, res) => employeeShiftController.updateEmployeeShift(req, res));
 
     // Xóa ca làm việc
     router.delete('/:id', roleMiddleware(['admin']), (req, res) => employeeShiftController.deleteEmployeeShift(req, res));

@@ -16,6 +16,9 @@ export class Medicine {
   @Column("character varying", { name: "unit" })
   unit!: string;
 
+  @Column("character varying", { name: "name" })
+  name!: string;
+
   @Column("numeric", { name: "price", precision: 10, scale: 2 })
   price!: string;
 

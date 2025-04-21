@@ -5,6 +5,8 @@ import { PositionsRepository } from '../../repositories/PositionsRepository';
 import { DataSource } from 'typeorm';
 import { AppDataSource } from '../../orm/dbCreateConnection';
 import { authMiddleware, roleMiddleware } from '../../middlewares/auth.middleware';
+import { validateDTO } from '../../middlewares/validation.middleware';
+import { CreatePositionDTO, UpdatePositionDTO } from '../../dtos/position/position.dto';    
 
 const router = Router();
 
@@ -19,8 +21,8 @@ const initializeRouter = async () => {
     router.use(authMiddleware);
 
     // Only admin can create, update, delete positions
-    router.post('/', roleMiddleware(['admin']), (req, res) => positionsController.createPosition(req, res));
-    router.put('/:id', roleMiddleware(['admin']), (req, res) => positionsController.updatePosition(req, res));
+    router.post('/', roleMiddleware(['admin']), validateDTO(CreatePositionDTO), (req, res) => positionsController.createPosition(req, res));
+    router.put('/:id', roleMiddleware(['admin']), validateDTO(UpdatePositionDTO), (req, res) => positionsController.updatePosition(req, res));
     router.delete('/:id', roleMiddleware(['admin']), (req, res) => positionsController.deletePosition(req, res));
 
     // All authenticated users can view positions
