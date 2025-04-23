@@ -8,7 +8,7 @@ import { authMiddleware, roleMiddleware } from '../../middlewares/auth.middlewar
 import { ShiftsRepository } from '../../repositories/ShiftsRepository';
 import { validateDTO } from '../../middlewares/validation.middleware';
 import { CreateEmployeeShiftDTO, UpdateEmployeeShiftDTO } from '../../dtos/employee-shift/employee-shift.dto';
-
+import { EmployeesRepository } from '../../repositories/EmployeesRepository';
 const router = Router();
 
 const initializeRouter = async () => {
@@ -16,7 +16,8 @@ const initializeRouter = async () => {
 
     const employeeShiftRepository = new EmployeeShiftRepository(dataSource);
     const shiftsRepository = new ShiftsRepository(dataSource);
-    const employeeShiftService = new EmployeeShiftService(employeeShiftRepository, shiftsRepository);
+    const employeesRepository = new EmployeesRepository(dataSource);
+    const employeeShiftService = new EmployeeShiftService(employeeShiftRepository, shiftsRepository, employeesRepository);
     const employeeShiftController = new EmployeeShiftController(employeeShiftService);
     router.use(authMiddleware);
 

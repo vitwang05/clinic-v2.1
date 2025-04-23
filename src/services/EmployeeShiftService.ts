@@ -7,18 +7,16 @@ import { UpdateEmployeeShiftDTO } from '../dtos/employee-shift/employee-shift.dt
 import { Employees } from '../orm/entities/Employees';
 import { Shifts } from '../orm/entities/Shifts';
 import { ShiftsRepository } from '../repositories/ShiftsRepository';
-
+import { EmployeesRepository } from '../repositories/EmployeesRepository';
 export class EmployeeShiftService {
     constructor(
         private employeeShiftRepository: EmployeeShiftRepository,
-        private shiftRepository: ShiftsRepository
+        private shiftRepository: ShiftsRepository,
+        private employeeRepository: EmployeesRepository
     ) {}
 
     private async checkEmployeeExists(employeeId: number): Promise<boolean> {
-        const employee = await this.employeeShiftRepository.findOne({
-            where: { employee: { id: employeeId } },
-            relations: ['employee']
-        });
+        const employee = await this.employeeRepository.findOne(employeeId);
         return !!employee;
     }
 
