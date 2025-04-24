@@ -1,4 +1,4 @@
-import { IsNumber, IsNotEmpty, IsString, IsOptional } from 'class-validator';
+import { IsNumber, IsNotEmpty, IsString, IsOptional, Min } from 'class-validator';
 
 export class CreateMedicineDTO {
     @IsString({ message: 'Tên thuốc phải là chuỗi' })
@@ -9,9 +9,15 @@ export class CreateMedicineDTO {
     @IsNotEmpty({ message: 'Đơn vị tính không được để trống' })
     unit!: string;
 
-    // @IsNumber({}, { message: 'Giá thuốc phải là số' })
+    @IsNumber({}, { message: 'Giá thuốc phải là số' })
+    @Min(0, { message: 'Giá thuốc không được âm' })
     @IsNotEmpty({ message: 'Giá thuốc không được để trống' })
     price!: string;
+
+    @IsNumber({}, { message: 'Số lượng tồn kho phải là số' })
+    @Min(0, { message: 'Số lượng tồn kho không được âm' })
+    @IsOptional()
+    stockQuantity?: number;
 }
 
 export class UpdateMedicineDTO {
@@ -23,7 +29,13 @@ export class UpdateMedicineDTO {
     @IsOptional()
     unit?: string;
 
-    // @IsNumber({}, { message: 'Giá thuốc phải là số' })
+    @IsNumber({}, { message: 'Giá thuốc phải là số' })
+    @Min(0, { message: 'Giá thuốc không được âm' })
     @IsOptional()
     price?: string;
+
+    @IsNumber({}, { message: 'Số lượng tồn kho phải là số' })
+    @Min(0, { message: 'Số lượng tồn kho không được âm' })
+    @IsOptional()
+    stockQuantity?: number;
 }

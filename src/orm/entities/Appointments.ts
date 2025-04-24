@@ -4,6 +4,7 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
@@ -11,6 +12,7 @@ import { Employees } from "./Employees";
 import { Patients } from "./Patients";
 import { TimeFrame } from "./TimeFrame";
 import { MedicalRecord } from "./MedicalRecord";
+import { Transactions } from "./Transactions";
 
 @Index("appointments_pkey", ["id"], { unique: true })
 @Entity("appointments")
@@ -55,4 +57,7 @@ export class Appointments {
 
   @OneToOne(() => MedicalRecord, (medicalRecord) => medicalRecord.appointment)
   medicalRecord!: MedicalRecord;
+
+  @OneToMany(() => Transactions, (transactions) => transactions.appointment)
+  transactions!: Transactions[];
 }

@@ -8,7 +8,7 @@ import {
 } from "typeorm";
 import { Prescriptions } from "./Prescriptions";
 import { Users } from "./Users";
-
+import { Appointments } from "./Appointments";
 @Index("transactions_pkey", ["id"], { unique: true })
 @Entity("transactions", { schema: "public" })
 export class Transactions {
@@ -22,6 +22,11 @@ export class Transactions {
     scale: 2,
   })
   totalMoney!: string | null;
+
+  @ManyToOne(() => Appointments, (appointments) => appointments.transactions)
+  @JoinColumn([{ name: "appointment_id", referencedColumnName: "id" }])
+  appointment!: Appointments;
+  
 
   @ManyToOne(() => Prescriptions, (prescriptions) => prescriptions.transactions)
   @JoinColumn([{ name: "prescription_id", referencedColumnName: "id" }])
