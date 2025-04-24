@@ -13,7 +13,7 @@ const router = Router();
 const initializeRouter = async () => {
     const dataSource: DataSource = await AppDataSource.initialize();
     const transactionsRepository = new TransactionsRepository(dataSource);
-    const transactionsService = new TransactionsService(transactionsRepository);
+    const transactionsService = new TransactionsService(dataSource);
     const transactionsController = new TransactionsController(transactionsService);
 
     // Apply auth middleware to all routes

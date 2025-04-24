@@ -1,17 +1,26 @@
 import { IsString, IsOptional, IsNumber, IsNotEmpty } from 'class-validator';
+import { AtLeastOneField } from '../../utils/AtLeastOneField';
 
 export class CreateTransactionDTO {
     @IsNumber()
-    @IsNotEmpty({ message: 'Prescription ID is required' })
+    @IsOptional()
     prescriptionId: number;
 
     @IsNumber()
-    @IsNotEmpty({ message: 'User ID is required' })
+    @IsOptional()
+    appointmentId: number;
+
+    @IsNumber()
+    @IsOptional()
     userId: number;
 
-    @IsString()
-    @IsNotEmpty({ message: 'Total money is required' })
-    totalMoney: string;
+    @IsNumber()
+    @IsOptional()
+    totalMoney?: number;
+    @AtLeastOneField(['prescriptionId', 'appointmentId'], {
+        message: 'At least one of prescriptionId or appointmentId must be provided',
+      })
+      dummyValidationTrigger: any;
 }
 
 export class UpdateTransactionDTO {
@@ -23,7 +32,7 @@ export class UpdateTransactionDTO {
     @IsOptional()
     userId?: number;
 
-    @IsString()
+    @IsNumber()
     @IsOptional()
-    totalMoney?: string;
+    totalMoney?: number;
 } 

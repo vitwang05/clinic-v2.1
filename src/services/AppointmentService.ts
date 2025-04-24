@@ -8,7 +8,7 @@ import {
   UpdateAppointmentDTO,
   AppointmentStatus,
 } from "../dtos/appointment/appointment.dto";
-
+import { sendAppointmentConfirmation } from "./EmailService";
 export class AppointmentService {
   constructor(
     private readonly dataSource: DataSource // Inject AppDataSource ở ngoài
@@ -69,7 +69,15 @@ export class AppointmentService {
       notes: dto.notes,
     });
 
-    return repo.save(appointment);
+    const email = patient.email;
+    const name = patient.fullName;
+    const appointmentDate = appointment.date;
+
+    const saveAppointment = await repo.save(appointment);
+    if (saveAppointment) {
+    await sendAppointmentConfirmation(email, name, new Date(appointmentDate));
+    }
+    return saveAppointment;
   }
 
   async updateAppointment(id: number, dto: UpdateAppointmentDTO): Promise<Appointments | null> {
@@ -81,7 +89,25 @@ export class AppointmentService {
 
     if (!appointment) return null;
 
-    if (dto.status) appointment.status = dto.status;
+    if (dto.status) {
+      const current = appointment.status;
+      const next = dto.status;
+
+      const validTransitions: Record<AppointmentStatus, AppointmentStatus[]> = {
+          [AppointmentStatus.PENDING]: [AppointmentStatus.CONFIRMED, AppointmentStatus.CANCELLED],
+          [AppointmentStatus.CONFIRMED]: [AppointmentStatus.IN_PROGRESS, AppointmentStatus.CANCELLED, AppointmentStatus.NO_SHOW],
+          [AppointmentStatus.IN_PROGRESS]: [AppointmentStatus.COMPLETED],
+          [AppointmentStatus.COMPLETED]: [],
+          [AppointmentStatus.CANCELLED]: [],
+          [AppointmentStatus.NO_SHOW]: [],
+      };
+
+      if (!validTransitions[current].includes(next)) {
+          throw new Error(`Không thể chuyển trạng thái từ ${current} sang ${next}`);
+      }
+
+      appointment.status = next;
+  }
     if (dto.notes !== undefined) appointment.notes = dto.notes;
 
     return repo.save(appointment);

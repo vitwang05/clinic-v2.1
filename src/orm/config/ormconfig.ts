@@ -15,6 +15,7 @@ const config: ConnectionOptions = {
   synchronize: false, // Đặt thành true để tự động tạo bảng
   logging: false,
   entities: ['src/orm/entities/*.ts'],
+  migrations: ['src/orm/migrations/*.ts'],
   namingStrategy: new SnakeNamingStrategy(),
 };
 

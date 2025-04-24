@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { PrescriptionDetail } from "./PrescriptionDetail";
+import { InventoryTransaction } from "./InventoryTransaction";
 
 @Index("medicine_pkey", ["id"], { unique: true })
 @Entity("medicine", { schema: "public" })
@@ -21,6 +22,9 @@ export class Medicine {
 
   @Column("numeric", { name: "price", precision: 10, scale: 2 })
   price!: string;
+
+  @Column("integer", { name: "stock_quantity", default: 0 })
+  stockQuantity!: number;
 
   @Column("timestamp without time zone", {
     name: "created_at",
@@ -41,4 +45,10 @@ export class Medicine {
     (prescriptionDetail) => prescriptionDetail.medicine
   )
   prescriptionDetails!: PrescriptionDetail[];
+
+  @OneToMany(
+    () => InventoryTransaction,
+    (transaction) => transaction.medicine
+  )
+  inventoryTransactions!: InventoryTransaction[];
 }
