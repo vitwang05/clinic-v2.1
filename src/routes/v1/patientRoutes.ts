@@ -24,15 +24,15 @@ const initializeRouter = async () => {
 
     // Only admin can create, update, delete patients
     router.post('/', roleMiddleware(['admin','patient']), validateDTO(CreatePatientDTO), (req, res) => patientsController.createPatient(req, res));
-    router.put('/:id', roleMiddleware(['admin']), validateDTO(UpdatePatientDTO), (req, res) => patientsController.updatePatient(req, res));
-    router.delete('/:id', roleMiddleware(['admin']), (req, res) => patientsController.deletePatient(req, res));
+    router.put('/:id', roleMiddleware(['admin', 'patient']), validateDTO(UpdatePatientDTO), (req, res) => patientsController.updatePatient(req, res));
+    router.delete('/:id', roleMiddleware(['admin', 'patient']), (req, res) => patientsController.deletePatient(req, res));
 
     // All authenticated users can view patients
-    router.get('/', (req, res) => patientsController.getAllPatients(req, res));
-    router.get('/:id', (req, res) => patientsController.getPatientById(req, res));
-    router.get('/search/cccd', (req, res) => patientsController.findByCCCD(req, res));
-    router.get('/search/phone', (req, res) => patientsController.findByPhoneNumber(req, res));
-    router.get('/search/email', (req, res) => patientsController.findByEmail(req, res));
+    router.get('/', roleMiddleware(['admin']), (req, res) => patientsController.getAllPatients(req, res));
+    router.get('/:id', roleMiddleware(['admin']), (req, res) => patientsController.getPatientById(req, res));
+    router.get('/search/cccd', roleMiddleware(['admin']), (req, res) => patientsController.findByCCCD(req, res));
+    router.get('/search/phone', roleMiddleware(['admin']), (req, res) => patientsController.findByPhoneNumber(req, res));
+    router.get('/search/email', roleMiddleware(['admin']), (req, res) => patientsController.findByEmail(req, res));
 };
 
 initializeRouter().catch((err) => {

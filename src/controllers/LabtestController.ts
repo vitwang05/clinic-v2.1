@@ -8,8 +8,13 @@ export class LabtestController {
     constructor(private labtestService: LabtestService) {}
 
     async getAllLabtests(req: Request, res: Response): Promise<void> {
-        const labtests = await this.labtestService.getAllLabtests();
-        res.status(200).json(ApiResponse.success(labtests));
+        if((req as any).user?.role.name === 'patient'){
+            // const labtests = await this.labtestService.getLabtestsByPatientId((req as any).user?.userId);
+            // res.status(200).json(ApiResponse.success(labtests));
+        }else{
+            const labtests = await this.labtestService.getAllLabtests();
+            res.status(200).json(ApiResponse.success(labtests));
+        }
     }
 
     async getLabtestById(req: Request, res: Response): Promise<void> {

@@ -13,6 +13,10 @@ export class CommonRepository<T extends ObjectLiteral> {
     this.repository = dataSource.getRepository(entity);
   }
 
+  protected get manager() {
+    return this.repository.manager;
+  }
+
   async findAll(): Promise<T[]> {
     return this.repository.find();
   }

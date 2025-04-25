@@ -21,11 +21,11 @@ const initializeRouter = async () => {
     router.use(authMiddleware);
 
     // Only admin can create/delete transactions
-    router.post('/', roleMiddleware(['admin']), validateDTO(CreateInventoryTransactionDTO), (req, res) => controller.createTransaction(req, res));
+    router.post('/', roleMiddleware(['admin','pharmacist']), validateDTO(CreateInventoryTransactionDTO), (req, res) => controller.createTransaction(req, res));
     router.delete('/:id', roleMiddleware(['admin']), (req, res) => controller.deleteTransaction(req, res));
 
     // All authenticated users can view
-    router.get('/', (req, res) => controller.getAllTransactions(req, res));
+    router.get('/', roleMiddleware(['admin','pharmacist']), (req, res) => controller.getAllTransactions(req, res));
     router.get('/:id', (req, res) => controller.getTransactionById(req, res));
 };
 

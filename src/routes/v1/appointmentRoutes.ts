@@ -21,9 +21,9 @@ const initializeRouter = async () => {
     router.use(authMiddleware);
 
     // Only admin can create, update, delete appointments
-    router.post('/', roleMiddleware(['admin']), validateDTO(CreateAppointmentDTO), (req, res) => appointmentController.createAppointment(req, res));
-    router.put('/:id', roleMiddleware(['admin']), validateDTO(UpdateAppointmentDTO), (req, res) => appointmentController.updateAppointment(req, res));
-    router.get('/doctor/:doctorId/:date',roleMiddleware(['admin', 'doctor']), (req, res)=> appointmentController.getDoctorAppointments(req,res));
+    router.post('/', roleMiddleware(['admin','patient','receptionist']), validateDTO(CreateAppointmentDTO), (req, res) => appointmentController.createAppointment(req, res));
+    router.put('/:id', roleMiddleware(['admin','receptionist']), validateDTO(UpdateAppointmentDTO), (req, res) => appointmentController.updateAppointment(req, res));
+    router.get('/doctor/:doctorId/:date',roleMiddleware(['admin', 'doctor', 'receptionist']), (req, res)=> appointmentController.getDoctorAppointments(req,res));
     router.get('/patienAppointment/:patientId', (req, res)=> appointmentController.getPatientAppointments(req,res));
     // All authenticated users can view appointments
     router.get('/:id', (req, res) => appointmentController.getAppointmentById(req, res));

@@ -9,6 +9,7 @@ import {
   AppointmentStatus,
 } from "../dtos/appointment/appointment.dto";
 import { sendAppointmentConfirmation } from "./EmailService";
+import { MedicalRecord } from "../orm/entities/MedicalRecord";
 export class AppointmentService {
   constructor(
     private readonly dataSource: DataSource // Inject AppDataSource ở ngoài
@@ -19,12 +20,16 @@ export class AppointmentService {
     return repo.findOne({ where: { id: doctorId } });
   }
 
-  private async checkPatientExists(patientId: number): Promise<Patients | null> {
+  private async checkPatientExists(
+    patientId: number
+  ): Promise<Patients | null> {
     const repo = this.dataSource.getRepository(Patients);
     return repo.findOne({ where: { id: patientId } });
   }
 
-  private async checkTimeFrameExists(timeFrameId: number): Promise<TimeFrame | null> {
+  private async checkTimeFrameExists(
+    timeFrameId: number
+  ): Promise<TimeFrame | null> {
     const repo = this.dataSource.getRepository(TimeFrame);
     return repo.findOne({ where: { id: timeFrameId } });
   }
@@ -57,7 +62,11 @@ export class AppointmentService {
     const timeFrame = await this.checkTimeFrameExists(dto.timeFrameId);
     if (!timeFrame) throw new Error("Khung giờ không tồn tại");
 
-    const isOverlap = await this.checkAppointmentOverlap(dto.doctorId, dto.timeFrameId, dto.date);
+    const isOverlap = await this.checkAppointmentOverlap(
+      dto.doctorId,
+      dto.timeFrameId,
+      dto.date
+    );
     if (isOverlap) throw new Error("Khung giờ này đã được đặt");
 
     const appointment = repo.create({
@@ -75,12 +84,15 @@ export class AppointmentService {
 
     const saveAppointment = await repo.save(appointment);
     if (saveAppointment) {
-    await sendAppointmentConfirmation(email, name, new Date(appointmentDate));
+      await sendAppointmentConfirmation(email, name, new Date(appointmentDate));
     }
     return saveAppointment;
   }
 
-  async updateAppointment(id: number, dto: UpdateAppointmentDTO): Promise<Appointments | null> {
+  async updateAppointment(
+    id: number,
+    dto: UpdateAppointmentDTO
+  ): Promise<Appointments | null> {
     const repo = this.dataSource.getRepository(Appointments);
     const appointment = await repo.findOne({
       where: { id },
@@ -94,20 +106,36 @@ export class AppointmentService {
       const next = dto.status;
 
       const validTransitions: Record<AppointmentStatus, AppointmentStatus[]> = {
-          [AppointmentStatus.PENDING]: [AppointmentStatus.CONFIRMED, AppointmentStatus.CANCELLED],
-          [AppointmentStatus.CONFIRMED]: [AppointmentStatus.IN_PROGRESS, AppointmentStatus.CANCELLED, AppointmentStatus.NO_SHOW],
-          [AppointmentStatus.IN_PROGRESS]: [AppointmentStatus.COMPLETED],
-          [AppointmentStatus.COMPLETED]: [],
-          [AppointmentStatus.CANCELLED]: [],
-          [AppointmentStatus.NO_SHOW]: [],
+        [AppointmentStatus.PENDING]: [
+          AppointmentStatus.CONFIRMED,
+          AppointmentStatus.CANCELLED,
+        ],
+        [AppointmentStatus.CONFIRMED]: [
+          AppointmentStatus.IN_PROGRESS,
+          AppointmentStatus.CANCELLED,
+          AppointmentStatus.NO_SHOW,
+        ],
+        [AppointmentStatus.IN_PROGRESS]: [AppointmentStatus.COMPLETED],
+        [AppointmentStatus.COMPLETED]: [],
+        [AppointmentStatus.CANCELLED]: [],
+        [AppointmentStatus.NO_SHOW]: [],
       };
 
       if (!validTransitions[current].includes(next)) {
-          throw new Error(`Không thể chuyển trạng thái từ ${current} sang ${next}`);
+        throw new Error(
+          `Không thể chuyển trạng thái từ ${current} sang ${next}`
+        );
       }
 
       appointment.status = next;
-  }
+      if (next === AppointmentStatus.IN_PROGRESS) {
+        const medicalRecord = await this.dataSource.getRepository(MedicalRecord).create({
+          appointmentId: appointment.id,
+          diagnosis: null,
+        });
+        await this.dataSource.getRepository(MedicalRecord).save(medicalRecord);
+      }
+    }
     if (dto.notes !== undefined) appointment.notes = dto.notes;
 
     return repo.save(appointment);
@@ -121,7 +149,10 @@ export class AppointmentService {
     });
   }
 
-  async getDoctorAppointments(doctorId: number, date: string): Promise<Appointments[]> {
+  async getDoctorAppointments(
+    doctorId: number,
+    date: string
+  ): Promise<Appointments[]> {
     const repo = this.dataSource.getRepository(Appointments);
     return repo.find({
       where: {

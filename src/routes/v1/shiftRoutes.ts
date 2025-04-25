@@ -21,9 +21,9 @@ const initializeRouter = async () => {
     router.use(authMiddleware);
 
     // Only admin can create, update, delete shifts
-    router.post('/', roleMiddleware(['admin']), validateDTO(CreateShiftDTO), (req, res) => shiftsController.createShift(req, res));
-    router.put('/:id', roleMiddleware(['admin']), validateDTO(UpdateShiftDTO), (req, res) => shiftsController.updateShift(req, res));
-    router.delete('/:id', roleMiddleware(['admin']), (req, res) => shiftsController.deleteShift(req, res));
+    router.post('/', roleMiddleware(['admin','doctor']), validateDTO(CreateShiftDTO), (req, res) => shiftsController.createShift(req, res));
+    router.put('/:id', roleMiddleware(['admin','doctor']), validateDTO(UpdateShiftDTO), (req, res) => shiftsController.updateShift(req, res));
+    router.delete('/:id', roleMiddleware(['admin','doctor']), (req, res) => shiftsController.deleteShift(req, res));
 
     // All authenticated users can view shifts
     router.get('/', (req, res) => shiftsController.getAllShifts(req, res));

@@ -13,10 +13,16 @@ export class LabtestService {
         return this.labtestRepository.findAll();
     }
 
+
+    async getLabtestsByPatientId(patientId: number): Promise<Labtest[]> {
+
+       return;
+    }
+
     async getLabtestById(id: number): Promise<Labtest> {
         const labtest = await this.labtestRepository.findOne(id);
         if (!labtest) {
-            throw new NotFoundException('Lab test not found');
+            throw new NotFoundException('Lab test not found');``
         }
         return labtest;
     }

@@ -5,9 +5,6 @@ export class CreatePrescriptionDetailDTO {
     @IsNotEmpty({ message: 'Medicine ID is required' })
     medicineId: number;
 
-    @IsNumber()
-    @IsNotEmpty({ message: 'Prescription ID is required' })
-    prescriptionId: number;
 
     @IsString()
     @IsOptional()

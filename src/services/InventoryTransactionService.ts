@@ -54,4 +54,6 @@ export class InventoryTransactionService {
         await this.medicinesRepository.update(medicine.id,medicine);
         await this.inventoryTransactionRepository.delete(id);
     }
+
+    
 } 

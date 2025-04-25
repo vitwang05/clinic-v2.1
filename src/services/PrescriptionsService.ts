@@ -1,6 +1,7 @@
 import { PrescriptionsRepository } from '../repositories/PrescriptionsRepository';
 import { Prescriptions } from '../orm/entities/Prescriptions';
 import { BadRequestException, NotFoundException } from '../exceptions';
+import { CreatePrescriptionDTO } from '../dtos/prescription/prescription.dto';
 
 export class PrescriptionsService {
     private prescriptionsRepository: PrescriptionsRepository;
@@ -21,8 +22,8 @@ export class PrescriptionsService {
         return prescription;
     }
 
-    async createPrescription(prescriptionData: Partial<Prescriptions>): Promise<Prescriptions> {
-        return this.prescriptionsRepository.save(prescriptionData as Prescriptions);
+    async createPrescription(prescriptionData: CreatePrescriptionDTO): Promise<Prescriptions> {
+        return this.prescriptionsRepository.createWithDetails(prescriptionData);
     }
 
     async updatePrescription(id: number, prescriptionData: Partial<Prescriptions>): Promise<Prescriptions> {

@@ -1,5 +1,6 @@
-import { IsString, IsOptional, IsNumber, IsNotEmpty } from 'class-validator';
-
+import { Type } from 'class-transformer';
+import { IsString, IsOptional, IsNumber, IsNotEmpty, ValidateNested, IsArray } from 'class-validator';
+import { CreatePrescriptionDetailDTO } from './prescriptionDetail.dto';
 export class CreatePrescriptionDTO {
     @IsNumber()
     @IsNotEmpty({ message: 'Medical Record ID is required' })
@@ -13,9 +14,10 @@ export class CreatePrescriptionDTO {
     @IsOptional()
     notes?: string;
 
-    @IsString()
-    @IsOptional()
-    total?: string;
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => CreatePrescriptionDetailDTO)
+    prescriptionDetails!: CreatePrescriptionDetailDTO[];
 }
 
 export class UpdatePrescriptionDTO {

@@ -20,12 +20,12 @@ const initializeRouter = async () => {
     router.use(authMiddleware);
 
     // Only admin can create, update, delete lab tests
-    router.post('/', roleMiddleware(['admin']), validateDTO(CreateLabtestDTO), (req, res) => labtestController.createLabtest(req, res));
-    router.put('/:id', roleMiddleware(['admin']), validateDTO(UpdateLabtestDTO), (req, res) => labtestController.updateLabtest(req, res));
-    router.delete('/:id', roleMiddleware(['admin']), (req, res) => labtestController.deleteLabtest(req, res));
+    router.post('/', roleMiddleware(['admin','doctor']), validateDTO(CreateLabtestDTO), (req, res) => labtestController.createLabtest(req, res));
+    router.put('/:id', roleMiddleware(['admin','doctor']), validateDTO(UpdateLabtestDTO), (req, res) => labtestController.updateLabtest(req, res));
+    router.delete('/:id', roleMiddleware(['admin','doctor']), (req, res) => labtestController.deleteLabtest(req, res));
 
     // All authenticated users can view lab tests
-    router.get('/', (req, res) => labtestController.getAllLabtests(req, res));
+    router.get('/', roleMiddleware(['admin','doctor', 'patient']), (req, res) => labtestController.getAllLabtests(req, res));
     router.get('/:id', (req, res) => labtestController.getLabtestById(req, res));
 };
 
