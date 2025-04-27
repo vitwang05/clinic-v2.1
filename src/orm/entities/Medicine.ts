@@ -21,7 +21,7 @@ export class Medicine {
   name!: string;
 
   @Column("numeric", { name: "price", precision: 10, scale: 2 })
-  price!: string;
+  price!: number;
 
   @Column("integer", { name: "stock_quantity", default: 0 })
   stockQuantity!: number;

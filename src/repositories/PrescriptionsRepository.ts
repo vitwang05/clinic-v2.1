@@ -28,7 +28,7 @@ export class PrescriptionsRepository extends CommonRepository<Prescriptions> {
     prescription.doctor = doctor;
     prescription.medicalRecord = record;
     // total will be calculated after details
-    prescription.total = "0.00";
+    prescription.total = 0;
     prescription.createdAt = new Date();
     prescription.updatedAt = new Date();
 
@@ -41,7 +41,7 @@ export class PrescriptionsRepository extends CommonRepository<Prescriptions> {
       const medicine = await manager.findOneByOrFail(Medicine, {
         id: item.medicineId,
       });
-      total += parseFloat(medicine.price);
+      total += medicine.price;
 
       const detail = new PrescriptionDetail();
       detail.prescription = savedPrescription; // Associate with the saved prescription
@@ -58,7 +58,7 @@ export class PrescriptionsRepository extends CommonRepository<Prescriptions> {
     await manager.save(PrescriptionDetail, detailEntities);
 
     // Update prescription total
-    savedPrescription.total = total.toFixed(2);
+    savedPrescription.total = total;
     savedPrescription.updatedAt = new Date();
     return manager.save(Prescriptions, savedPrescription);
   }

@@ -145,7 +145,7 @@ export class AppointmentService {
     const repo = this.dataSource.getRepository(Appointments);
     return repo.findOne({
       where: { id },
-      relations: ["doctor", "patient", "timeFrame"],
+      relations: ["doctor", "patient", "timeFrame", "medicalRecord"],
     });
   }
 
@@ -159,7 +159,7 @@ export class AppointmentService {
         doctor: { id: doctorId },
         date: date,
       },
-      relations: ["patient", "timeFrame"],
+      relations: ["patient", "timeFrame", "medicalRecord"],
       order: {
         timeFrame: {
           startTime: "ASC",
@@ -174,7 +174,7 @@ export class AppointmentService {
       where: {
         patient: { id: patientId },
       },
-      relations: ["doctor", "timeFrame"],
+      relations: ["doctor", "timeFrame", "medicalRecord"],
       order: {
         date: "DESC",
         timeFrame: {

@@ -35,5 +35,5 @@ export class UpdatePrescriptionDTO {
 
     @IsString()
     @IsOptional()
-    total?: string;
+    total?: number;
 } 

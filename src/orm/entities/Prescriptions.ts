@@ -22,7 +22,7 @@ export class Prescriptions {
   notes!: string | null;
 
   @Column("numeric", { name: "total", nullable: true, precision: 10, scale: 2 })
-  total!: string | null;
+  total!: number | null;
 
   @Column("timestamp without time zone", {
     name: "created_at",

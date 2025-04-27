@@ -10,10 +10,6 @@ export class CreateTransactionDTO {
     @IsOptional()
     appointmentId: number;
 
-    @IsNumber()
-    @IsOptional()
-    userId: number;
-
 
     @AtLeastOneField(['prescriptionId', 'appointmentId'], {
         message: 'At least one of prescriptionId or appointmentId must be provided',

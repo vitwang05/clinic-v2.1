@@ -21,7 +21,7 @@ export class Transactions {
     precision: 10,
     scale: 2,
   })
-  totalMoney!: string | null;
+  totalMoney!: number | null;
 
   @ManyToOne(() => Appointments, (appointments) => appointments.transactions)
   @JoinColumn([{ name: "appointment_id", referencedColumnName: "id" }])

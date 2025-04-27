@@ -1,16 +1,24 @@
 import { LabtestRepository } from '../repositories/LabtestRepository';
 import { Labtest } from '../orm/entities/Labtest';
 import { BadRequestException, NotFoundException } from '../exceptions';
-
+import { CreateLabtestDTO } from '../dtos/lab/labtest.dto';
+import { MedicalRecordRepository } from '../repositories/MedicalRecordRepository';
+import { EmployeesRepository } from '../repositories/EmployeesRepository';
+import { TestTypeRepository } from '../repositories/TestTypeRepository';
 export class LabtestService {
     private labtestRepository: LabtestRepository;
-
-    constructor(labtestRepository: LabtestRepository) {
+    private medicalRecordRepository: MedicalRecordRepository;
+    private doctorRepository: EmployeesRepository;
+    private testTypeRepository: TestTypeRepository;
+    constructor(labtestRepository: LabtestRepository, medicalRecordRepository: MedicalRecordRepository, doctorRepository: EmployeesRepository, testTypeRepository: TestTypeRepository) {
         this.labtestRepository = labtestRepository;
+        this.medicalRecordRepository = medicalRecordRepository;
+        this.doctorRepository = doctorRepository;
+        this.testTypeRepository = testTypeRepository;
     }
 
     async getAllLabtests(): Promise<Labtest[]> {
-        return this.labtestRepository.findAll();
+        return this.labtestRepository.findWithRelations(['medicalRecord', 'doctor', 'testType']);
     }
 
 
@@ -27,8 +35,22 @@ export class LabtestService {
         return labtest;
     }
 
-    async createLabtest(labtestData: Partial<Labtest>): Promise<Labtest> {
-        return this.labtestRepository.save(labtestData as Labtest);
+    async createLabtest(labtestData: CreateLabtestDTO): Promise<Labtest> {
+        const medicalRecord = await this.medicalRecordRepository.findOne(labtestData.medicalRecordId);
+        if (!medicalRecord) {
+            throw new NotFoundException('Medical record not found');
+        }
+        const doctor = await this.doctorRepository.findOne(labtestData.doctorId);
+        if (!doctor) {
+            throw new NotFoundException('Doctor not found');
+        }
+        const testType = await this.testTypeRepository.findOne(labtestData.testTypeId);
+        if (!testType) {        
+            throw new NotFoundException('Test type not found');
+        }
+        const labtest = this.labtestRepository.create({ ...labtestData, medicalRecord, doctor, testType });
+
+        return this.labtestRepository.save(labtest);
     }
 
     async updateLabtest(id: number, labtestData: Partial<Labtest>): Promise<Labtest> {

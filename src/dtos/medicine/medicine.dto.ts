@@ -12,7 +12,7 @@ export class CreateMedicineDTO {
     @IsNumber({}, { message: 'Giá thuốc phải là số' })
     @Min(0, { message: 'Giá thuốc không được âm' })
     @IsNotEmpty({ message: 'Giá thuốc không được để trống' })
-    price!: string;
+    price!: number;
 
     @IsNumber({}, { message: 'Số lượng tồn kho phải là số' })
     @Min(0, { message: 'Số lượng tồn kho không được âm' })
@@ -32,7 +32,7 @@ export class UpdateMedicineDTO {
     @IsNumber({}, { message: 'Giá thuốc phải là số' })
     @Min(0, { message: 'Giá thuốc không được âm' })
     @IsOptional()
-    price?: string;
+    price?: number;
 
     @IsNumber({}, { message: 'Số lượng tồn kho phải là số' })
     @Min(0, { message: 'Số lượng tồn kho không được âm' })

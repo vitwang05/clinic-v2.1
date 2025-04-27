@@ -17,7 +17,7 @@ export class TestType {
   name!: string;
 
   @Column("numeric", { name: "price", precision: 10, scale: 2 })
-  price!: string;
+  price!: number;
 
   @Column("timestamp without time zone", {
     name: "created_at",

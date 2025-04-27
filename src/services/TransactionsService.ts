@@ -7,6 +7,8 @@ import { Prescriptions } from '../orm/entities/Prescriptions';
 import { Appointments } from '../orm/entities/Appointments';
 import { Labtest } from '../orm/entities/Labtest';
 import { MedicalRecord } from '../orm/entities/MedicalRecord';
+import { AppointmentStatus } from '../dtos/appointment/appointment.dto';
+import { Users } from '../orm/entities/Users';
 export class TransactionsService {
     constructor(
         private readonly dataSource: DataSource // Inject AppDataSource ở ngoài
@@ -37,28 +39,43 @@ export class TransactionsService {
             totalMoney = Number(prescription.total);
             transactionData.appointmentId = null;
             const transactionRepo = this.dataSource.getRepository(Transactions);
-            const transaction = transactionRepo.create({...transactionData, totalMoney: totalMoney.toString()});
+            const transaction = transactionRepo.create({...transactionData, prescription: prescription, totalMoney: totalMoney});
             return transactionRepo.save(transaction);
         }
         if(transactionData.appointmentId){
             const repo = this.dataSource.getRepository(Appointments);
-            const appointment = await repo.findOne({ where: { id: transactionData.appointmentId } });
+            const appointment = await repo.findOne({ where: { id: transactionData.appointmentId }, relations: ['patient', 'patient.user'], });
+            console.log(appointment);
+            const userRepo = this.dataSource.getRepository(Users);
             if (!appointment) {
                 throw new NotFoundException('Appointment not found');
             }
+            const user = await userRepo.findOne({ where: { id:appointment.patient.user.id } });
+            if (!user) {
+                throw new NotFoundException('User not found');
+            }
+            if(appointment.status !== AppointmentStatus.COMPLETED){
+                throw new BadRequestException('Appointment is not completed');
+            }
             const medicalRecordRepo = this.dataSource.getRepository(MedicalRecord);
-            const medicalRecord = await medicalRecordRepo.findOne({ where: { id: appointment.medicalRecord.id } });
+            const medicalRecord = await medicalRecordRepo.findOne({ where: { appointmentId: appointment.id }, relations: ['appointment'] });
             if (!medicalRecord) {
                 throw new NotFoundException('Medical record not found');
             }
-            const labtest = await this.dataSource.getRepository(Labtest).findOne({ where: { medicalRecord: medicalRecord } });
-            if (!labtest) {
+            console.log(medicalRecord);
+            const labtest = await this.dataSource.getRepository(Labtest).find({ where: { medicalRecord: { id: medicalRecord.id }}, relations: ['testType'] });
+            console.log(labtest);
+            if (labtest.length === 0) {
                 throw new NotFoundException('Lab test not found');
             }
-            totalMoney = Number(labtest.testType.price);
+            for (const test of labtest) {
+                if(test.testType){
+                    totalMoney += Number(test.testType.price);
+                }
+            }
             transactionData.prescriptionId = null;
             const transactionRepo = this.dataSource.getRepository(Transactions);
-            const transaction = transactionRepo.create({...transactionData, totalMoney: totalMoney.toString()});
+            const transaction = transactionRepo.create({...transactionData, appointment: appointment, totalMoney: totalMoney, user: user});
             return transactionRepo.save(transaction);
         }
     }
@@ -71,7 +88,7 @@ export class TransactionsService {
         }
         const updateData = {
             ...transactionData,
-            totalMoney: transactionData.totalMoney?.toString()
+            totalMoney: transactionData.totalMoney
         };
         await repo.update(id, updateData);
         return await repo.findOne({ where: { id } });

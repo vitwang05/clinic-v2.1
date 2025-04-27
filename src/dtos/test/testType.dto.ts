@@ -5,9 +5,9 @@ export class CreateTestTypeDTO {
     @MinLength(2, { message: 'Tên loại xét nghiệm phải có ít nhất 2 ký tự' })
     name: string;
 
-    // @IsNumber()
+    @IsNumber({}, { message: 'Giá xét nghiệm phải là số' })
     @IsNotEmpty({ message: 'Giá xét nghiệm là bắt buộc' })
-    price: string;
+    price: number;
 }
 
 export class UpdateTestTypeDTO {
@@ -16,7 +16,7 @@ export class UpdateTestTypeDTO {
     @MinLength(2, { message: 'Tên loại xét nghiệm phải có ít nhất 2 ký tự' })
     name?: string;
 
-    // @IsNumber()
+    @IsNumber({}, { message: 'Giá xét nghiệm phải là số' })
     @IsOptional()
-    price?: string;
+    price?: number;
 }
