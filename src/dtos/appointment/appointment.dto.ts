@@ -1,4 +1,4 @@
-import { IsNumber, IsString, IsDateString, IsEnum, IsOptional, IsNotEmpty } from 'class-validator';
+import { IsNumber, IsString, IsDateString, IsEnum, IsOptional, IsNotEmpty, IsArray } from 'class-validator';
 
 export enum AppointmentStatus {
     PENDING = 'pending',           // Đang chờ xác nhận
@@ -29,6 +29,10 @@ export class CreateAppointmentDTO {
     @IsString()
     @IsOptional()
     notes?: string;
+
+    @IsArray()
+    @IsOptional()
+    services?: number[];
 }
 
 export class UpdateAppointmentDTO {

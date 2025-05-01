@@ -23,6 +23,7 @@ export class PrescriptionsService {
     }
 
     async createPrescription(prescriptionData: CreatePrescriptionDTO): Promise<Prescriptions> {
+        
         return this.prescriptionsRepository.createWithDetails(prescriptionData);
     }
 

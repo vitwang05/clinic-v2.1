@@ -36,14 +36,29 @@ export class EmployeeShiftService {
             },
             relations: ['shift']
         });
-
+        const toMinutes = (timeStr: string): number => {
+            const [h, m, s] = timeStr.split(':').map(Number);
+            return h * 60 + m;
+        };
+        
+        const newStart = toMinutes(shift.startTime);
+        const newEnd = toMinutes(shift.endTime);
+        
+        console.log(newStart, newEnd);
         for (const existingShift of existingShifts) {
             const s = existingShift.shift;
-            if (
-                (shift.startTime <= s.endTime && shift.endTime >= s.startTime) ||
-                (s.startTime <= shift.endTime && s.endTime >= shift.startTime)
-            ) {
-                return true;
+            const existStart = toMinutes(s.startTime);
+            const existEnd = toMinutes(s.endTime);
+            console.log(existStart, existEnd);
+            if (newStart < existStart) {
+                if (newEnd > existStart) {
+                    return true;
+                }
+            }
+            if (newStart > existStart) {
+                if (newStart < existEnd) {
+                    return true;
+                }
             }
         }
 
@@ -116,6 +131,7 @@ export class EmployeeShiftService {
     }
 
     async createEmployeeShift(dto: CreateEmployeeShiftDTO): Promise<EmployeeShift> {
+        console.log(dto);
         const employeeExists = await this.checkEmployeeExists(dto.employeeId);
         if (!employeeExists) throw new Error('Nhân viên không tồn tại');
 
@@ -125,9 +141,7 @@ export class EmployeeShiftService {
         const hasOverlap = await this.checkShiftOverlap(dto.employeeId, dto.shiftId, dto.shiftDate);
         if (hasOverlap) throw new Error('Ca làm việc trùng thời gian');
 
-        const employee = await this.employeeShiftRepository.manager.findOne(Employees, {
-            where: { id: dto.employeeId }
-        });
+        const employee = await this.employeeRepository.findOne(dto.employeeId);
         const shift = await this.shiftRepository.findOne( dto.shiftId );
 
         const employeeShift = this.employeeShiftRepository.create({

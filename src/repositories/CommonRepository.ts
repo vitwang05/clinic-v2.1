@@ -22,7 +22,7 @@ export class CommonRepository<T extends ObjectLiteral> {
   }
 
   async findOne(id: number | FindOptionsWhere<T>): Promise<T | null> {
-    return this.repository.findOneBy(id as any);
+    return this.repository.findOne({ where: { id } as any });
   }
 
   async save(entity: T): Promise<T> {

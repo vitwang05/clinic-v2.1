@@ -13,6 +13,7 @@ import { Patients } from "./Patients";
 import { TimeFrame } from "./TimeFrame";
 import { MedicalRecord } from "./MedicalRecord";
 import { Transactions } from "./Transactions";
+import { AppointmentServices } from "./AppointmentService";
 
 @Index("appointments_pkey", ["id"], { unique: true })
 @Entity("appointments")
@@ -60,4 +61,7 @@ export class Appointments {
 
   @OneToMany(() => Transactions, (transactions) => transactions.appointment)
   transactions!: Transactions[];
+
+  @OneToMany(() => AppointmentServices, (as) => as.appointment)
+  appointmentServices!: AppointmentServices[];
 }

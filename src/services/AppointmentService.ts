@@ -1,4 +1,4 @@
-import { DataSource } from "typeorm";
+import { DataSource, In } from "typeorm";
 import { Appointments } from "../orm/entities/Appointments";
 import { Employees } from "../orm/entities/Employees";
 import { Patients } from "../orm/entities/Patients";
@@ -10,6 +10,12 @@ import {
 } from "../dtos/appointment/appointment.dto";
 import { sendAppointmentConfirmation } from "./EmailService";
 import { MedicalRecord } from "../orm/entities/MedicalRecord";
+import { Services } from "../orm/entities/Services";
+import { AppointmentServices } from "../orm/entities/AppointmentService";
+import { TimeFrameService } from "./TimeFrameService";
+import { EmployeeShift } from "../orm/entities/EmployeeShift";
+import { TimeFrameRepository } from "../repositories/TimeFrameRepository";
+import { EmployeeShiftRepository } from "../repositories/EmployeeShiftRepository";
 export class AppointmentService {
   constructor(
     private readonly dataSource: DataSource // Inject AppDataSource ở ngoài
@@ -28,10 +34,22 @@ export class AppointmentService {
   }
 
   private async checkTimeFrameExists(
-    timeFrameId: number
+    timeFrameId: number,
+    doctorId: number,
+    date: string
   ): Promise<TimeFrame | null> {
     const repo = this.dataSource.getRepository(TimeFrame);
-    return repo.findOne({ where: { id: timeFrameId } });
+    const timeFrame = await repo.findOne({ where: { id: timeFrameId } });
+    console.log(timeFrame);
+    if (!timeFrame) throw new Error("Khung giờ không tồn tại");
+    const timeFrameService = new TimeFrameService(new TimeFrameRepository(this.dataSource), new EmployeeShiftRepository(this.dataSource));
+    const employeeShift = await timeFrameService.getDoctorTimeFrames({
+      doctorId: doctorId,
+      date: date,
+    });
+    console.log(employeeShift);
+    if (!employeeShift.some((frame) => frame.id === timeFrame.id)) throw new Error("Khung giờ không tồn tại");
+    return timeFrame;
   }
 
   private async checkAppointmentOverlap(
@@ -50,6 +68,22 @@ export class AppointmentService {
     return !!existing;
   }
 
+  private async checkServicesExists(services: number[]): Promise<boolean> {
+    const repo = this.dataSource.getRepository(Services);
+    const existing = await repo.find({ where: { id: In(services) } });
+    return existing.length === services.length;
+  }
+
+  private async createAppointmentServices(appointment: Appointments, service: number[]): Promise<void> {
+    const repo = this.dataSource.getRepository(AppointmentServices);
+    const services = await this.dataSource.getRepository(Services).find({where: {id: In(service) } });
+    const appointmentServices = services.map((service) => ({
+      appointment,
+      service,
+    }));
+    await repo.save(appointmentServices);
+  }
+
   async createAppointment(dto: CreateAppointmentDTO): Promise<Appointments> {
     const repo = this.dataSource.getRepository(Appointments);
 
@@ -59,9 +93,16 @@ export class AppointmentService {
     const patient = await this.checkPatientExists(dto.patientId);
     if (!patient) throw new Error("Bệnh nhân không tồn tại");
 
-    const timeFrame = await this.checkTimeFrameExists(dto.timeFrameId);
+    const timeFrame = await this.checkTimeFrameExists(dto.timeFrameId, dto.doctorId, dto.date);
     if (!timeFrame) throw new Error("Khung giờ không tồn tại");
 
+
+    if(dto.date < new Date().toISOString().split('T')[0]) throw new Error("Ngày khám không được trong quá khứ");
+
+    if (dto.services?.length !== 0) {
+      const services = await this.checkServicesExists(dto.services);
+      if (!services) throw new Error("Dịch vụ không tồn tại");
+    }
     const isOverlap = await this.checkAppointmentOverlap(
       dto.doctorId,
       dto.timeFrameId,
@@ -85,6 +126,7 @@ export class AppointmentService {
     const saveAppointment = await repo.save(appointment);
     if (saveAppointment) {
       await sendAppointmentConfirmation(email, name, new Date(appointmentDate));
+      await this.createAppointmentServices(saveAppointment, dto.services);
     }
     return saveAppointment;
   }
@@ -145,7 +187,7 @@ export class AppointmentService {
     const repo = this.dataSource.getRepository(Appointments);
     return repo.findOne({
       where: { id },
-      relations: ["doctor", "patient", "timeFrame", "medicalRecord"],
+      relations: ["doctor", "patient", "timeFrame", "medicalRecord", "appointmentServices.service"],
     });
   }
 

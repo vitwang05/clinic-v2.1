@@ -58,8 +58,6 @@ export class TimeFrameService {
     }
 
     async getDoctorTimeFrames(dto: GetDoctorTimeFramesDTO): Promise<TimeFrame[]> {
- 
-    
     
         // Lấy tất cả ca làm việc của bác sĩ trong ngày
         const employeeShifts = await this.employeeShiftRepository.find({
