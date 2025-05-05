@@ -119,6 +119,11 @@ export class AppointmentService {
       notes: dto.notes,
     });
 
+    if(dto.isWalkIn) {
+      appointment.isWalkIn = true;
+      appointment.status = AppointmentStatus.WAITING;
+    }
+
     const email = patient.email;
     const name = patient.fullName;
     const appointmentDate = appointment.date;
@@ -152,16 +157,40 @@ export class AppointmentService {
           AppointmentStatus.CONFIRMED,
           AppointmentStatus.CANCELLED,
         ],
+      
         [AppointmentStatus.CONFIRMED]: [
-          AppointmentStatus.IN_PROGRESS,
+          AppointmentStatus.CHECKED_IN,
           AppointmentStatus.CANCELLED,
           AppointmentStatus.NO_SHOW,
         ],
-        [AppointmentStatus.IN_PROGRESS]: [AppointmentStatus.COMPLETED],
+      
+        [AppointmentStatus.CHECKED_IN]: [
+          AppointmentStatus.WAITING,
+          AppointmentStatus.CANCELLED,
+        ],
+      
+        [AppointmentStatus.WAITING]: [
+          AppointmentStatus.CALLED,
+          AppointmentStatus.CANCELLED,
+        ],
+      
+        [AppointmentStatus.CALLED]: [
+          AppointmentStatus.IN_PROGRESS,
+          AppointmentStatus.CANCELLED,
+        ],
+      
+        [AppointmentStatus.IN_PROGRESS]: [
+          AppointmentStatus.COMPLETED,
+          AppointmentStatus.CANCELLED,
+        ],
+      
         [AppointmentStatus.COMPLETED]: [],
+      
         [AppointmentStatus.CANCELLED]: [],
+      
         [AppointmentStatus.NO_SHOW]: [],
       };
+      
 
       if (!validTransitions[current].includes(next)) {
         throw new Error(
@@ -176,6 +205,18 @@ export class AppointmentService {
           diagnosis: null,
         });
         await this.dataSource.getRepository(MedicalRecord).save(medicalRecord);
+      }
+      if (next === AppointmentStatus.CHECKED_IN) {
+        appointment.checkInTime = new Date();
+      }
+      if (next === AppointmentStatus.WAITING) {
+        appointment.startTime = new Date();
+      }
+      if (next === AppointmentStatus.CALLED) {
+        appointment.calledInTime = new Date();
+      }
+      if (next === AppointmentStatus.COMPLETED || next === AppointmentStatus.CANCELLED) {
+        appointment.endTime = new Date();
       }
     }
     if (dto.notes !== undefined) appointment.notes = dto.notes;
@@ -194,21 +235,110 @@ export class AppointmentService {
   async getDoctorAppointments(
     doctorId: number,
     date: string
-  ): Promise<Appointments[]> {
+): Promise<Appointments[]> {
     const repo = this.dataSource.getRepository(Appointments);
-    return repo.find({
-      where: {
-        doctor: { id: doctorId },
-        date: date,
-      },
-      relations: ["patient", "timeFrame", "medicalRecord"],
-      order: {
-        timeFrame: {
-          startTime: "ASC",
+
+    const today = new Date();
+    const inputDate = new Date(date);
+
+    // Kiểm tra nếu ngày truyền vào là quá khứ
+    const isPastDate = inputDate.getTime() < today.setHours(0, 0, 0, 0); 
+
+    // Lấy tất cả lịch hẹn của bác sĩ trong ngày
+    const appointments = await repo.find({
+        where: {
+            doctor: { id: doctorId },
+            date: date,
         },
-      },
+        relations: ["patient", "timeFrame", "medicalRecord"],
+        order: {
+            timeFrame: {
+                startTime: "ASC",
+            },
+        },
     });
-  }
+
+    const now = new Date();
+
+    // Phân loại các bệnh nhân
+    const onTimeNonWalkIns: Appointments[] = [];
+    const lateNonWalkIns: Appointments[] = [];
+    const walkIns: Appointments[] = [];
+
+    for (const appt of appointments) {
+        const isLate =
+            !appt.isWalkIn &&
+            appt.status === "waiting" &&
+            new Date(appt.timeFrame.startTime) < now;
+
+        if (appt.isWalkIn) {
+            walkIns.push(appt);
+        } else if (isLate) {
+            lateNonWalkIns.push(appt);
+        } else {
+            onTimeNonWalkIns.push(appt);
+        }
+    }
+
+    if (isPastDate) {
+        // Sắp xếp các nhóm lịch hẹn trong quá khứ theo status và thời gian
+        appointments.sort((a, b) => {
+            const statusPriority = {
+                'waiting': 0,
+                'called': 1,
+                'in_progress': 2,
+                'completed': 3,
+                'cancelled': 4,
+                'no_show': 5,
+                'pending': 6,
+                'confirmed': 7,
+                'checked_in': 8,
+            };
+
+            // Sắp xếp theo status
+            const statusComparison = statusPriority[a.status] - statusPriority[b.status];
+            if (statusComparison !== 0) {
+                return statusComparison;
+            }
+
+            // Nếu status giống nhau, sắp xếp theo thời gian
+            return new Date(a.timeFrame.startTime).getTime() - new Date(b.timeFrame.startTime).getTime();
+        });
+    } else {
+        // Sắp xếp các nhóm lịch hẹn còn lại (ngày hiện tại hoặc tương lai)
+        onTimeNonWalkIns.sort(
+            (a, b) =>
+                new Date(a.timeFrame.startTime).getTime() -
+                new Date(b.timeFrame.startTime).getTime()
+        );
+
+        walkIns.sort((a, b) => {
+            const aTime = a.checkInTime?.getTime() || 0;
+            const bTime = b.checkInTime?.getTime() || 0;
+            return aTime - bTime;
+        });
+
+        lateNonWalkIns.sort(
+            (a, b) =>
+                new Date(a.timeFrame.startTime).getTime() -
+                new Date(b.timeFrame.startTime).getTime()
+        );
+
+        // Gán số thứ tự cho walk-in (chỉ gán trong bộ nhớ mà không cần lưu vào DB)
+        walkIns.forEach((appt, index) => {
+            // Gán STT cho các bệnh nhân walk-in
+            appt.queueNumber = index + 1;
+        });
+    }
+
+    const finalQueue = [...onTimeNonWalkIns, ...walkIns, ...lateNonWalkIns];
+
+    return finalQueue;
+}
+
+
+  
+
 
   async getPatientAppointments(patientId: number): Promise<Appointments[]> {
     const repo = this.dataSource.getRepository(Appointments);

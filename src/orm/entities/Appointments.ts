@@ -30,6 +30,24 @@ export class Appointments {
   @Column("text", { name: "notes", nullable: true })
   notes!: string | null;
 
+  @Column("boolean", { name: "is_walk_in", default: false })
+  isWalkIn!: boolean;
+
+  @Column("integer", { name: "queue_number", nullable: true })
+  queueNumber!: number | null;
+
+  @Column({ nullable: true })
+  checkInTime: Date;
+
+  @Column({ nullable: true })
+  calledInTime: Date;
+
+  @Column({ nullable: true })
+  startTime: Date;
+
+  @Column({ nullable: true })
+  endTime: Date;
+
   @Column("timestamp without time zone", {
     name: "created_at",
     nullable: true,

@@ -1,9 +1,12 @@
-import { IsNumber, IsString, IsDateString, IsEnum, IsOptional, IsNotEmpty, IsArray } from 'class-validator';
+import { IsNumber, IsString, IsDateString, IsEnum, IsOptional, IsNotEmpty, IsArray, IsBoolean } from 'class-validator';
 
 export enum AppointmentStatus {
     PENDING = 'pending',           // Đang chờ xác nhận
     CONFIRMED = 'confirmed',       // Đã xác nhận
     CANCELLED = 'cancelled',       // Đã hủy
+    CHECKED_IN = 'checked_in',     // Bệnh nhân đã đến và check-in tại quầy
+    WAITING = 'waiting',           // Đã check-in nhưng đang chờ gọi vào khám
+    CALLED = 'called',             // Đã được gọi vào phòng khám
     IN_PROGRESS = 'in_progress',   // Đang khám
     COMPLETED = 'completed',       // Đã hoàn thành
     NO_SHOW = 'no_show'           // Không đến khám
@@ -29,6 +32,10 @@ export class CreateAppointmentDTO {
     @IsString()
     @IsOptional()
     notes?: string;
+
+    @IsBoolean()
+    @IsOptional()
+    isWalkIn?: boolean;
 
     @IsArray()
     @IsOptional()

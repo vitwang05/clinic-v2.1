@@ -11,6 +11,9 @@ export class AppointmentController {
         try {
             const dto: CreateAppointmentDTO = req.body;
             console.log(dto);
+            if((req as any).user?.role.name === 'receptionist') {
+                dto.isWalkIn = true;
+            }
             const appointment = await this.appointmentService.createAppointment(dto);
             res.status(201).json(ApiResponse.success(appointment));
         } catch (error) {
