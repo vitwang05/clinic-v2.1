@@ -55,7 +55,8 @@ export class AppointmentService {
   private async checkAppointmentOverlap(
     doctorId: number,
     timeFrameId: number,
-    date: string
+    date: string,
+    patientId: number
   ): Promise<boolean> {
     const repo = this.dataSource.getRepository(Appointments);
     const existing = await repo.findOne({
@@ -65,6 +66,9 @@ export class AppointmentService {
         date: date,
       },
     });
+    if(existing && existing.patient.user.id === patientId) {
+      throw new Error("Hệ thống đã nhận được yêu cầu của bạn. Vui lòng chờ xác nhận từ bác sĩ!");
+    }
     return !!existing;
   }
 
@@ -106,7 +110,8 @@ export class AppointmentService {
     const isOverlap = await this.checkAppointmentOverlap(
       dto.doctorId,
       dto.timeFrameId,
-      dto.date
+      dto.date,
+      patient.user.id
     );
     if (isOverlap) throw new Error("Khung giờ này đã được đặt");
 
