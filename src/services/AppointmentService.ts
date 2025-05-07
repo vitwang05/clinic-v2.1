@@ -42,13 +42,17 @@ export class AppointmentService {
     const timeFrame = await repo.findOne({ where: { id: timeFrameId } });
     console.log(timeFrame);
     if (!timeFrame) throw new Error("Khung giờ không tồn tại");
-    const timeFrameService = new TimeFrameService(new TimeFrameRepository(this.dataSource), new EmployeeShiftRepository(this.dataSource));
+    const timeFrameService = new TimeFrameService(
+      new TimeFrameRepository(this.dataSource),
+      new EmployeeShiftRepository(this.dataSource)
+    );
     const employeeShift = await timeFrameService.getDoctorTimeFrames({
       doctorId: doctorId,
       date: date,
     });
     console.log(employeeShift);
-    if (!employeeShift.some((frame) => frame.id === timeFrame.id)) throw new Error("Khung giờ không tồn tại");
+    if (!employeeShift.some((frame) => frame.id === timeFrame.id))
+      throw new Error("Khung giờ không tồn tại");
     return timeFrame;
   }
 
@@ -66,8 +70,10 @@ export class AppointmentService {
         date: date,
       },
     });
-    if(existing && existing.patient.user.id === patientId) {
-      throw new Error("Hệ thống đã nhận được yêu cầu của bạn. Vui lòng chờ xác nhận từ bác sĩ!");
+    if (existing && existing.patient.user.id === patientId) {
+      throw new Error(
+        "Hệ thống đã nhận được yêu cầu của bạn. Vui lòng chờ xác nhận từ bác sĩ!"
+      );
     }
     return !!existing;
   }
@@ -78,9 +84,14 @@ export class AppointmentService {
     return existing.length === services.length;
   }
 
-  private async createAppointmentServices(appointment: Appointments, service: number[]): Promise<void> {
+  private async createAppointmentServices(
+    appointment: Appointments,
+    service: number[]
+  ): Promise<void> {
     const repo = this.dataSource.getRepository(AppointmentServices);
-    const services = await this.dataSource.getRepository(Services).find({where: {id: In(service) } });
+    const services = await this.dataSource
+      .getRepository(Services)
+      .find({ where: { id: In(service) } });
     const appointmentServices = services.map((service) => ({
       appointment,
       service,
@@ -97,11 +108,15 @@ export class AppointmentService {
     const patient = await this.checkPatientExists(dto.patientId);
     if (!patient) throw new Error("Bệnh nhân không tồn tại");
 
-    const timeFrame = await this.checkTimeFrameExists(dto.timeFrameId, dto.doctorId, dto.date);
+    const timeFrame = await this.checkTimeFrameExists(
+      dto.timeFrameId,
+      dto.doctorId,
+      dto.date
+    );
     if (!timeFrame) throw new Error("Khung giờ không tồn tại");
 
-
-    if(dto.date < new Date().toISOString().split('T')[0]) throw new Error("Ngày khám không được trong quá khứ");
+    if (dto.date < new Date().toISOString().split("T")[0])
+      throw new Error("Ngày khám không được trong quá khứ");
 
     if (dto.services?.length !== 0) {
       const services = await this.checkServicesExists(dto.services);
@@ -124,9 +139,14 @@ export class AppointmentService {
       notes: dto.notes,
     });
 
-    if(dto.isWalkIn) {
+    if (dto.isWalkIn) {
       appointment.isWalkIn = true;
       appointment.status = AppointmentStatus.WAITING;
+      const queueNumber = await this.assignQueueNumbers(
+        dto.doctorId,
+        dto.date
+      );
+      appointment.queueNumber = queueNumber;
     }
 
     const email = patient.email;
@@ -162,40 +182,39 @@ export class AppointmentService {
           AppointmentStatus.CONFIRMED,
           AppointmentStatus.CANCELLED,
         ],
-      
+
         [AppointmentStatus.CONFIRMED]: [
           AppointmentStatus.CHECKED_IN,
           AppointmentStatus.CANCELLED,
           AppointmentStatus.NO_SHOW,
         ],
-      
+
         [AppointmentStatus.CHECKED_IN]: [
           AppointmentStatus.WAITING,
           AppointmentStatus.CANCELLED,
         ],
-      
+
         [AppointmentStatus.WAITING]: [
           AppointmentStatus.CALLED,
           AppointmentStatus.CANCELLED,
         ],
-      
+
         [AppointmentStatus.CALLED]: [
           AppointmentStatus.IN_PROGRESS,
           AppointmentStatus.CANCELLED,
         ],
-      
+
         [AppointmentStatus.IN_PROGRESS]: [
           AppointmentStatus.COMPLETED,
           AppointmentStatus.CANCELLED,
         ],
-      
+
         [AppointmentStatus.COMPLETED]: [],
-      
+
         [AppointmentStatus.CANCELLED]: [],
-      
+
         [AppointmentStatus.NO_SHOW]: [],
       };
-      
 
       if (!validTransitions[current].includes(next)) {
         throw new Error(
@@ -205,10 +224,12 @@ export class AppointmentService {
 
       appointment.status = next;
       if (next === AppointmentStatus.IN_PROGRESS) {
-        const medicalRecord = await this.dataSource.getRepository(MedicalRecord).create({
-          appointmentId: appointment.id,
-          diagnosis: null,
-        });
+        const medicalRecord = await this.dataSource
+          .getRepository(MedicalRecord)
+          .create({
+            appointmentId: appointment.id,
+            diagnosis: null,
+          });
         await this.dataSource.getRepository(MedicalRecord).save(medicalRecord);
       }
       if (next === AppointmentStatus.CHECKED_IN) {
@@ -220,7 +241,10 @@ export class AppointmentService {
       if (next === AppointmentStatus.CALLED) {
         appointment.calledInTime = new Date();
       }
-      if (next === AppointmentStatus.COMPLETED || next === AppointmentStatus.CANCELLED) {
+      if (
+        next === AppointmentStatus.COMPLETED ||
+        next === AppointmentStatus.CANCELLED
+      ) {
         appointment.endTime = new Date();
       }
     }
@@ -233,117 +257,44 @@ export class AppointmentService {
     const repo = this.dataSource.getRepository(Appointments);
     return repo.findOne({
       where: { id },
-      relations: ["doctor", "patient", "timeFrame", "medicalRecord", "appointmentServices.service"],
+      relations: [
+        "doctor",
+        "patient",
+        "timeFrame",
+        "medicalRecord",
+        "appointmentServices.service",
+      ],
     });
   }
 
   async getDoctorAppointments(
     doctorId: number,
     date: string
-): Promise<Appointments[]> {
+  ): Promise<Appointments[]> {
     const repo = this.dataSource.getRepository(Appointments);
 
     const today = new Date();
     const inputDate = new Date(date);
 
     // Kiểm tra nếu ngày truyền vào là quá khứ
-    const isPastDate = inputDate.getTime() < today.setHours(0, 0, 0, 0); 
+    const isPastDate = inputDate.getTime() < today.setHours(0, 0, 0, 0);
 
     // Lấy tất cả lịch hẹn của bác sĩ trong ngày
     const appointments = await repo.find({
-        where: {
-            doctor: { id: doctorId },
-            date: date,
+      where: {
+        doctor: { id: doctorId },
+        date: date,
+      },
+      relations: ["patient", "timeFrame", "medicalRecord"],
+      order: {
+        timeFrame: {
+          startTime: "ASC",
         },
-        relations: ["patient", "timeFrame", "medicalRecord"],
-        order: {
-            timeFrame: {
-                startTime: "ASC",
-            },
-        },
+      },
     });
 
-    const now = new Date();
-
-    // Phân loại các bệnh nhân
-    const onTimeNonWalkIns: Appointments[] = [];
-    const lateNonWalkIns: Appointments[] = [];
-    const walkIns: Appointments[] = [];
-
-    for (const appt of appointments) {
-        const isLate =
-            !appt.isWalkIn &&
-            appt.status === "waiting" &&
-            new Date(appt.timeFrame.startTime) < now;
-
-        if (appt.isWalkIn) {
-            walkIns.push(appt);
-        } else if (isLate) {
-            lateNonWalkIns.push(appt);
-        } else {
-            onTimeNonWalkIns.push(appt);
-        }
-    }
-
-    if (isPastDate) {
-        // Sắp xếp các nhóm lịch hẹn trong quá khứ theo status và thời gian
-        appointments.sort((a, b) => {
-            const statusPriority = {
-                'waiting': 0,
-                'called': 1,
-                'in_progress': 2,
-                'completed': 3,
-                'cancelled': 4,
-                'no_show': 5,
-                'pending': 6,
-                'confirmed': 7,
-                'checked_in': 8,
-            };
-
-            // Sắp xếp theo status
-            const statusComparison = statusPriority[a.status] - statusPriority[b.status];
-            if (statusComparison !== 0) {
-                return statusComparison;
-            }
-
-            // Nếu status giống nhau, sắp xếp theo thời gian
-            return new Date(a.timeFrame.startTime).getTime() - new Date(b.timeFrame.startTime).getTime();
-        });
-    } else {
-        // Sắp xếp các nhóm lịch hẹn còn lại (ngày hiện tại hoặc tương lai)
-        onTimeNonWalkIns.sort(
-            (a, b) =>
-                new Date(a.timeFrame.startTime).getTime() -
-                new Date(b.timeFrame.startTime).getTime()
-        );
-
-        walkIns.sort((a, b) => {
-            const aTime = a.checkInTime?.getTime() || 0;
-            const bTime = b.checkInTime?.getTime() || 0;
-            return aTime - bTime;
-        });
-
-        lateNonWalkIns.sort(
-            (a, b) =>
-                new Date(a.timeFrame.startTime).getTime() -
-                new Date(b.timeFrame.startTime).getTime()
-        );
-
-        // Gán số thứ tự cho walk-in (chỉ gán trong bộ nhớ mà không cần lưu vào DB)
-        walkIns.forEach((appt, index) => {
-            // Gán STT cho các bệnh nhân walk-in
-            appt.queueNumber = index + 1;
-        });
-    }
-
-    const finalQueue = [...onTimeNonWalkIns, ...walkIns, ...lateNonWalkIns];
-
-    return finalQueue;
-}
-
-
-  
-
+    return appointments;
+  }
 
   async getPatientAppointments(patientId: number): Promise<Appointments[]> {
     const repo = this.dataSource.getRepository(Appointments);
@@ -359,5 +310,21 @@ export class AppointmentService {
         },
       },
     });
+  }
+
+  async assignQueueNumbers(doctorId: number, date: string): Promise<number> {
+    const appointments = await this.dataSource
+      .getRepository(Appointments)
+      .find({
+        where: {
+          doctor: { id: doctorId },
+          date: date,
+          isWalkIn: true,
+        },
+      });
+
+    const queueNumber = appointments.length + 1;
+
+    return queueNumber;
   }
 }

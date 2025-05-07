@@ -19,7 +19,6 @@ export class AuthController {
 
     async register(req: Request, res: Response) {
         try {
-
             const registerDTO: RegisterDTO = req.body;
             const user = await this.authService.register(registerDTO);
             res.status(201).json(ApiResponse.success(toUserDTO(user)));

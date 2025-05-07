@@ -23,8 +23,8 @@ const initializeRouter = async () => {
     router.use(authMiddleware);
 
     // Only admin can create, update, delete patients
-    router.post('/', roleMiddleware(['admin','patient']), validateDTO(CreatePatientDTO), (req, res) => patientsController.createPatient(req, res));
-    router.put('/:id', roleMiddleware(['admin', 'patient']), validateDTO(UpdatePatientDTO), (req, res) => patientsController.updatePatient(req, res));
+    router.post('/', roleMiddleware(['admin','patient','receptionist']), validateDTO(CreatePatientDTO), (req, res) => patientsController.createPatient(req, res));
+    router.put('/:id', roleMiddleware(['admin', 'patient','receptionist']), validateDTO(UpdatePatientDTO), (req, res) => patientsController.updatePatient(req, res));
     router.delete('/:id', roleMiddleware(['admin', 'patient']), (req, res) => patientsController.deletePatient(req, res));
 
     // All authenticated users can view patients

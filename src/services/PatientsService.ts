@@ -59,22 +59,22 @@ export class PatientsService {
   }
 
   async createPatient(patientDTO: CreatePatientDTO): Promise<Patients> {
-    // const patientRepository = this.dataSource!.getRepository(Patients);
-    // const userRepository = this.dataSource!.getRepository(Users);
-
+    let user: Users | null = null;
     // Find the user
-    const user = await this.usersRepository.findOne(patientDTO.userId);
-
-    if (!user) {
-      throw new Error("User not found");
+    if(patientDTO.userId){
+      user = await this.usersRepository.findOne(patientDTO.userId);
+      
+      if (!user) {
+        throw new Error("User not found");
+      }
     }
-
+      
     // Create patient with user relationship
     const patient = this.patientsRepository.create({
       ...patientDTO,
       user: user,
     });
-
+    
     return this.patientsRepository.save(patient);
   }
 

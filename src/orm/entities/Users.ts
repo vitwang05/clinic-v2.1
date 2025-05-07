@@ -57,6 +57,6 @@ export class Users {
   transactions!: Transactions[];
 
   @ManyToOne(() => Roles, (roles) => roles.users)
-  @JoinColumn([{ name: "role_id", referencedColumnName: "id" }])
+  @JoinColumn([{ name: "role_id", referencedColumnName: "id"}])
   role!: Roles;
 }

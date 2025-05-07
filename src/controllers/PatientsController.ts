@@ -30,7 +30,7 @@ export class PatientsController {
 
     async createPatient(req: Request, res: Response): Promise<void> {
         const createPatientDTO: CreatePatientDTO = req.body;
-        if ((req as any).user?.role.name !== 'admin') {
+        if ((req as any).user?.role.name === 'patient') {
             createPatientDTO.userId = (req as any).user?.userId;
         }
         console.log(createPatientDTO.userId);

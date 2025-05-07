@@ -4,7 +4,7 @@ import { AuthService } from '../../services/AuthService';
 import { AppDataSource } from '../../orm/dbCreateConnection';
 import { DataSource } from 'typeorm';
 
-import { authMiddleware } from '../../middlewares/auth.middleware';
+import { authMiddleware, roleMiddleware } from '../../middlewares/auth.middleware';
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
 import { BadRequestException } from '../../exceptions';
@@ -14,6 +14,7 @@ import { UsersService } from '../../services/UsersService';
 import { TokensService } from '../../services/TokensService';
 import { UsersRepository } from '../../repositories/UsersRepository';
 import { ApiResponse } from '../../utils/ApiResponse';
+import { EmployeesRepository } from '../../repositories/EmployeesRepository';
 const router = Router();
 
 // Validation middleware for DTOs
@@ -37,13 +38,15 @@ const initializeRouter = async () => {
     try {
         const dataSource: DataSource = await AppDataSource.initialize(); // Ensure DB connection is established
         const usersRepository = new UsersRepository(dataSource);
+        const employeesRepository = new EmployeesRepository(dataSource);
         // Initialize services and controller after DB connection is successful
-        const usersService = new UsersService(usersRepository);  // Pass dataSource to UsersService
+        const usersService = new UsersService(usersRepository, employeesRepository, dataSource);  // Pass dataSource to UsersService
         const tokensService = new TokensService();  // Assuming TokensService does not need a DB connection
         const authService = new AuthService(usersService, tokensService);  // Pass initialized services to AuthService
         const authController = new AuthController(authService);  // Pass authService to AuthController
 
         // Set up routes
+        router.post('/addUser', authMiddleware, roleMiddleware(['admin']), async (req, res) => authController.register(req, res));
         router.post('/register', validateDTO(RegisterDTO), (req, res) => authController.register(req, res));
         router.post('/login', validateDTO(LoginDTO), (req, res) => authController.login(req, res));
         router.post('/logout', authMiddleware, async (req, res) => {

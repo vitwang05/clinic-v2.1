@@ -1,4 +1,4 @@
-import { IsEmail, IsString, Matches, MinLength } from 'class-validator';
+import { IsEmail, IsNumber, IsOptional, IsString, Matches, MinLength } from 'class-validator';
 
 export class RegisterDTO {
     @IsEmail({}, { message: 'Email không hợp lệ' })
@@ -14,4 +14,8 @@ export class RegisterDTO {
     @IsString()
     @Matches(/^[0-9]{10,11}$/, { message: 'Số điện thoại không hợp lệ' })
     phoneNumber: string;
+
+    @IsNumber()
+    @IsOptional()
+    employeeId?: number;
 } 

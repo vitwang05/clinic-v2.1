@@ -5,7 +5,7 @@ import { Tokens } from '../orm/entities/Tokens';
 import * as bcrypt from 'bcrypt';
 import * as jwt from 'jsonwebtoken';
 import { BadRequestException, UnauthorizedException } from '../exceptions';
-
+import { RegisterDTO } from '../dtos/auth/register.dto';
 export class AuthService {
     private usersService: UsersService;
     private tokensService: TokensService;
@@ -15,7 +15,7 @@ export class AuthService {
         this.tokensService = tokensService;
     }
 
-    async register(userData: Partial<Users>): Promise<Users> {
+    async register(userData: RegisterDTO): Promise<Users> {
         const existingUserByEmail = await this.usersService.findByEmail(userData.email);
         if (existingUserByEmail) {
             throw new BadRequestException('Email already exists');
@@ -29,8 +29,20 @@ export class AuthService {
         if (userData.password) {
             userData.password = await bcrypt.hash(userData.password, 10);
         }
-
         return this.usersService.createUser(userData as Users);
+    }
+
+    async registerForEmployee(userData: RegisterDTO, roleId: number, employeeId: number): Promise<Users> {
+        const existingUserByEmail = await this.usersService.findByEmail(userData.email);
+        if (existingUserByEmail) {
+            throw new BadRequestException('Email already exists');
+        };
+
+        if (userData.password) {
+            userData.password = await bcrypt.hash(userData.password, 10);
+        }
+        return this.usersService.createUserForEmployee(userData as Users, roleId, employeeId);
+        
     }
 
     async login(email: string, password: string): Promise<{ user: Users; token: string }> {
