@@ -17,11 +17,11 @@ export class PrescriptionsRepository extends CommonRepository<Prescriptions> {
     const doctor = await manager.findOneByOrFail(Employees, {
       id: dto.doctorId,
     });
-    console.log(doctor);
+  
     const record = await manager.findOneByOrFail(MedicalRecord, {
       id: dto.medicalRecordId,
     });
-    console.log(record);
+
     // Create prescription entity
     const prescription = new Prescriptions();
     prescription.notes = dto.notes ?? null;

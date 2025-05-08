@@ -4,14 +4,15 @@ import { UsersService } from '../../services/UsersService';
 import { UsersRepository } from '../../repositories/UsersRepository';
 import { DataSource } from 'typeorm';
 import { AppDataSource } from '../../orm/dbCreateConnection';
-
+import { EmployeesRepository } from '../../repositories/EmployeesRepository';
 const router = Router();
 
 const initializeRouter = async () => {
   try {
     const dataSource: DataSource = await AppDataSource.initialize(); // Khởi tạo kết nối DB
     const usersRepository = new UsersRepository(dataSource);
-    const usersService = new UsersService(usersRepository);
+    const employeesRepository = new EmployeesRepository(dataSource);
+    const usersService = new UsersService(usersRepository, employeesRepository, dataSource);
     const usersController = new UsersController(usersService);
 
     // Định nghĩa các route

@@ -18,4 +18,8 @@ export class RegisterDTO {
     @IsNumber()
     @IsOptional()
     employeeId?: number;
+
+    @IsNumber()
+    @IsOptional()
+    roleId?: number;
 } 

@@ -9,12 +9,12 @@ export class AppointmentController {
 
     async createAppointment(req: Request, res: Response): Promise<void> {
         try {
+            
             const dto: CreateAppointmentDTO = req.body;
-            console.log(dto);
             if((req as any).user?.role.name === 'receptionist') {
                 dto.isWalkIn = true;
             }
-            
+            console.log(dto);
             const appointment = await this.appointmentService.createAppointment(dto);
             res.status(201).json(ApiResponse.success(appointment));
         } catch (error) {

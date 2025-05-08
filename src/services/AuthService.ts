@@ -32,7 +32,7 @@ export class AuthService {
         return this.usersService.createUser(userData as Users);
     }
 
-    async registerForEmployee(userData: RegisterDTO, roleId: number, employeeId: number): Promise<Users> {
+    async registerForEmployee(userData: RegisterDTO): Promise<Users> {
         const existingUserByEmail = await this.usersService.findByEmail(userData.email);
         if (existingUserByEmail) {
             throw new BadRequestException('Email already exists');
@@ -41,7 +41,8 @@ export class AuthService {
         if (userData.password) {
             userData.password = await bcrypt.hash(userData.password, 10);
         }
-        return this.usersService.createUserForEmployee(userData as Users, roleId, employeeId);
+     
+        return this.usersService.createUserForEmployee(userData as Users, userData.roleId, userData.employeeId);
         
     }
 

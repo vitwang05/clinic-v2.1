@@ -27,6 +27,16 @@ export class AuthController {
         }
     }
 
+    async registerForEmployee(req: Request, res: Response) {
+        try {
+            const registerDTO: RegisterDTO = req.body;
+            const user = await this.authService.registerForEmployee(registerDTO);
+            res.status(201).json(ApiResponse.success(toUserDTO(user)));
+        } catch (error) {
+            res.status(400).json(ApiResponse.error(error));
+        }
+    }
+
     async login(req: Request, res: Response) {
         try {
             const loginDTO: LoginDTO = req.body;

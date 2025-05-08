@@ -58,11 +58,12 @@ export class UsersService {
   async createUserForEmployee(user: Users, roleId: number, employeeId: number): Promise<Users> {
     let employee: Employees | null = null;
     if(employeeId){
-      employee = await this.employeesRepository.findOne({
-          id: employeeId
-      });
+      employee = await this.employeesRepository.findOneWithRelations(employeeId, ["user"]);
       if(!employee){
         throw new BadRequestException('Employee not found');
+      }
+      if(employee.user){
+        throw new BadRequestException('Employee already has a user');
       }
     }
     user.role = await this.dataSource.getRepository(Roles).findOne({

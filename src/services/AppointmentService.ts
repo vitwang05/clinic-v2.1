@@ -30,7 +30,7 @@ export class AppointmentService {
     patientId: number
   ): Promise<Patients | null> {
     const repo = this.dataSource.getRepository(Patients);
-    return repo.findOne({ where: { id: patientId } });
+    return repo.findOne({ where: { id: patientId }, relations: ["user"] });
   }
 
   private async checkTimeFrameExists(
@@ -40,7 +40,7 @@ export class AppointmentService {
   ): Promise<TimeFrame | null> {
     const repo = this.dataSource.getRepository(TimeFrame);
     const timeFrame = await repo.findOne({ where: { id: timeFrameId } });
-    console.log(timeFrame);
+   
     if (!timeFrame) throw new Error("Khung giờ không tồn tại");
     const timeFrameService = new TimeFrameService(
       new TimeFrameRepository(this.dataSource),
@@ -50,7 +50,7 @@ export class AppointmentService {
       doctorId: doctorId,
       date: date,
     });
-    console.log(employeeShift);
+   
     if (!employeeShift.some((frame) => frame.id === timeFrame.id))
       throw new Error("Khung giờ không tồn tại");
     return timeFrame;
@@ -60,7 +60,7 @@ export class AppointmentService {
     doctorId: number,
     timeFrameId: number,
     date: string,
-    patientId: number
+    patientId: number | null
   ): Promise<boolean> {
     const repo = this.dataSource.getRepository(Appointments);
     const existing = await repo.findOne({
@@ -68,9 +68,11 @@ export class AppointmentService {
         doctor: { id: doctorId },
         timeFrame: { id: timeFrameId },
         date: date,
-      },
+      },relations:["patient.user"]
     });
-    if (existing && existing.patient.user.id === patientId) {
+    const userId = existing?.patient?.user?.id;
+
+    if (userId != null && patientId != null && userId === patientId) {
       throw new Error(
         "Hệ thống đã nhận được yêu cầu của bạn. Vui lòng chờ xác nhận từ bác sĩ!"
       );
@@ -103,9 +105,11 @@ export class AppointmentService {
     const repo = this.dataSource.getRepository(Appointments);
 
     const doctor = await this.checkDoctorExists(dto.doctorId);
+    console.log(doctor);
     if (!doctor) throw new Error("Bác sĩ không tồn tại");
 
     const patient = await this.checkPatientExists(dto.patientId);
+    console.log(patient);
     if (!patient) throw new Error("Bệnh nhân không tồn tại");
 
     const timeFrame = await this.checkTimeFrameExists(
@@ -113,12 +117,14 @@ export class AppointmentService {
       dto.doctorId,
       dto.date
     );
+    console.log(timeFrame);
     if (!timeFrame) throw new Error("Khung giờ không tồn tại");
 
     if (dto.date < new Date().toISOString().split("T")[0])
       throw new Error("Ngày khám không được trong quá khứ");
 
     if (dto.services?.length !== 0) {
+  
       const services = await this.checkServicesExists(dto.services);
       if (!services) throw new Error("Dịch vụ không tồn tại");
     }
@@ -126,8 +132,9 @@ export class AppointmentService {
       dto.doctorId,
       dto.timeFrameId,
       dto.date,
-      patient.user.id
+      patient?.user?.id ?? null
     );
+    console.log(isOverlap);
     if (isOverlap) throw new Error("Khung giờ này đã được đặt");
 
     const appointment = repo.create({
@@ -146,6 +153,7 @@ export class AppointmentService {
         dto.doctorId,
         dto.date
       );
+      appointment.checkInTime = new Date();
       appointment.queueNumber = queueNumber;
     }
 

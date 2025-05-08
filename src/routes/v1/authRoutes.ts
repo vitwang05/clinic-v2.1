@@ -46,7 +46,7 @@ const initializeRouter = async () => {
         const authController = new AuthController(authService);  // Pass authService to AuthController
 
         // Set up routes
-        router.post('/addUser', authMiddleware, roleMiddleware(['admin']), async (req, res) => authController.register(req, res));
+        router.post('/addUser', authMiddleware, roleMiddleware(['admin']), async (req, res) => authController.registerForEmployee(req, res));
         router.post('/register', validateDTO(RegisterDTO), (req, res) => authController.register(req, res));
         router.post('/login', validateDTO(LoginDTO), (req, res) => authController.login(req, res));
         router.post('/logout', authMiddleware, async (req, res) => {

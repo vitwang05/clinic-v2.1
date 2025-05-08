@@ -12,7 +12,7 @@ const config: ConnectionOptions = {
   username: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  synchronize: true, // Đặt thành true để tự động tạo bảng
+  synchronize: false, // Đặt thành true để tự động tạo bảng
   logging: false,
   entities: ['src/orm/entities/*.ts'],
   migrations: ['src/orm/migrations/*.ts'],

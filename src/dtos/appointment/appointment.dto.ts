@@ -39,7 +39,7 @@ export class CreateAppointmentDTO {
 
     @IsArray()
     @IsOptional()
-    services?: number[];
+    services?: number[]=[];
 }
 
 export class UpdateAppointmentDTO {

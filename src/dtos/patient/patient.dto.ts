@@ -47,6 +47,7 @@ export class CreatePatientDTO {
 
     @IsNumber({}, { message: 'ID người dùng phải là số' })
     @IsNotEmpty({ message: 'ID người dùng không được để trống' })
+    @IsOptional()
     userId!: number;
 }
 

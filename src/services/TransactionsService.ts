@@ -45,7 +45,7 @@ export class TransactionsService {
         if(transactionData.appointmentId){
             const repo = this.dataSource.getRepository(Appointments);
             const appointment = await repo.findOne({ where: { id: transactionData.appointmentId }, relations: ['patient', 'patient.user'], });
-            console.log(appointment);
+          
             const userRepo = this.dataSource.getRepository(Users);
             if (!appointment) {
                 throw new NotFoundException('Appointment not found');
@@ -62,9 +62,9 @@ export class TransactionsService {
             if (!medicalRecord) {
                 throw new NotFoundException('Medical record not found');
             }
-            console.log(medicalRecord);
+
             const labtest = await this.dataSource.getRepository(Labtest).find({ where: { medicalRecord: { id: medicalRecord.id }}, relations: ['testType'] });
-            console.log(labtest);
+   
             if (labtest.length === 0) {
                 throw new NotFoundException('Lab test not found');
             }

@@ -32,8 +32,11 @@ export class PatientsController {
         const createPatientDTO: CreatePatientDTO = req.body;
         if ((req as any).user?.role.name === 'patient') {
             createPatientDTO.userId = (req as any).user?.userId;
+            if(createPatientDTO?.relationshipWithUser == null){
+                throw new Error("Vui lòng chọn mối quan hệ với người dùng");
+            }
         }
-        console.log(createPatientDTO.userId);
+        (createPatientDTO.userId);
         const patient = await this.patientsService.createPatient(createPatientDTO);
         res.status(201).json(ApiResponse.success(patient));
     }

@@ -44,12 +44,12 @@ export class EmployeeShiftService {
         const newStart = toMinutes(shift.startTime);
         const newEnd = toMinutes(shift.endTime);
         
-        console.log(newStart, newEnd);
+      
         for (const existingShift of existingShifts) {
             const s = existingShift.shift;
             const existStart = toMinutes(s.startTime);
             const existEnd = toMinutes(s.endTime);
-            console.log(existStart, existEnd);
+          
             if (newStart < existStart) {
                 if (newEnd > existStart) {
                     return true;
@@ -131,7 +131,7 @@ export class EmployeeShiftService {
     }
 
     async createEmployeeShift(dto: CreateEmployeeShiftDTO): Promise<EmployeeShift> {
-        console.log(dto);
+    
         const employeeExists = await this.checkEmployeeExists(dto.employeeId);
         if (!employeeExists) throw new Error('Nhân viên không tồn tại');
 

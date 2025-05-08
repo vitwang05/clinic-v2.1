@@ -19,7 +19,7 @@ export class PrescriptionsController {
     }
 
     async createPrescription(req: Request, res: Response): Promise<void> {
-        console.log(req.body);
+    
         const createPrescriptionDTO: CreatePrescriptionDTO = req.body;
         const prescription = await this.prescriptionsService.createPrescription(createPrescriptionDTO);
         res.status(201).json(ApiResponse.success(prescription));

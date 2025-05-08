@@ -78,13 +78,12 @@ export class TimeFrameController {
 
     async getDoctorTimeFrames(req: Request, res: Response): Promise<void> {
         try {
-            console.log("run");
+         
             const dto: GetDoctorTimeFramesDTO = {
                 doctorId: Number(req.params.doctorId),
                 date: req.params.date
             };
-            console.log(dto);
-
+        
             const timeFrames = await this.timeFrameService.getDoctorTimeFrames(dto);
             res.status(200).json(ApiResponse.success(timeFrames));
         } catch (error) {
