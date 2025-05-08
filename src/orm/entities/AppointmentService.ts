@@ -8,7 +8,7 @@ import {
   import { Appointments } from "./Appointments";
   import { Services } from "./Services";
   
-  @Entity("appointment_services")
+  @Entity("appointment_services", {schema: "appointment"})
   export class AppointmentServices {
     @PrimaryGeneratedColumn()
     id: number;

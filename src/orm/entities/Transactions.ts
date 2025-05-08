@@ -10,7 +10,7 @@ import { Prescriptions } from "./Prescriptions";
 import { Users } from "./Users";
 import { Appointments } from "./Appointments";
 @Index("transactions_pkey", ["id"], { unique: true })
-@Entity("transactions", { schema: "public" })
+@Entity("transactions", { schema: "transaction" })
 export class Transactions {
   @PrimaryGeneratedColumn({ type: "integer", name: "id" })
   id!: number;

@@ -9,7 +9,7 @@ import {
 import { Users } from "./Users";
 
 @Index("tokens_pkey", ["id"], { unique: true })
-@Entity("tokens", { schema: "public" })
+@Entity("tokens", { schema: "auth" })
 export class Tokens {
   @PrimaryGeneratedColumn({ type: "integer", name: "id" })
   id!: number;

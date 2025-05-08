@@ -13,7 +13,7 @@ import { Prescriptions } from "./Prescriptions";
 
 @Index("medical_record_appointment_id_key", ["appointmentId"], { unique: true })
 @Index("medical_record_pkey", ["id"], { unique: true })
-@Entity("medical_record", { schema: "public" })
+@Entity("medical_record", { schema: "appointment" })
 export class MedicalRecord {
   @PrimaryGeneratedColumn({ type: "integer", name: "id" })
   id!: number;

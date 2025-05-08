@@ -11,7 +11,7 @@ import { Employees } from "./Employees";
 import { Departments } from "./Departments";
 
 @Index("positions_pkey", ["id"], { unique: true })
-@Entity("positions", { schema: "public" })
+@Entity("positions", { schema: "employee" })
 export class Positions {
   @PrimaryGeneratedColumn({ type: "integer", name: "id" })
   id!: number;

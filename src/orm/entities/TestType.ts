@@ -8,7 +8,7 @@ import {
 import { Labtest } from "./Labtest";
 
 @Index("test_type_pkey", ["id"], { unique: true })
-@Entity("test_type", { schema: "public" })
+@Entity("test_type", { schema: "lab" })
 export class TestType {
   @PrimaryGeneratedColumn({ type: "integer", name: "id" })
   id!: number;

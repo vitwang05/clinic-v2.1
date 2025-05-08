@@ -9,7 +9,7 @@ import { PrescriptionDetail } from "./PrescriptionDetail";
 import { InventoryTransaction } from "./InventoryTransaction";
 
 @Index("medicine_pkey", ["id"], { unique: true })
-@Entity("medicine", { schema: "public" })
+@Entity("medicine", { schema: "inventory" })
 export class Medicine {
   @PrimaryGeneratedColumn({ type: "integer", name: "id" })
   id!: number;

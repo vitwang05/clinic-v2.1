@@ -10,7 +10,7 @@ import { Employees } from "./Employees";
 import { Shifts } from "./Shifts";
 
 @Index("employee_shift_pkey", ["id"], { unique: true })
-@Entity("employee_shift", { schema: "public" })
+@Entity("employee_shift", { schema: "employee" })
 export class EmployeeShift {
   @PrimaryGeneratedColumn({ type: "integer", name: "id" })
   id!: number;

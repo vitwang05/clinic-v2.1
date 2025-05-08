@@ -17,7 +17,7 @@ import { Prescriptions } from "./Prescriptions";
 @Index("employees_email_key", ["email"], { unique: true })
 @Index("employees_pkey", ["id"], { unique: true })
 @Index("employees_phone_number_key", ["phoneNumber"], { unique: true })
-@Entity("employees", { schema: "public" })
+@Entity("employees", { schema: "employee" })
 export class Employees {
   @PrimaryGeneratedColumn({ type: "integer", name: "id" })
   id!: number;

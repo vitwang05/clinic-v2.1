@@ -11,7 +11,7 @@ import { MedicalRecord } from "./MedicalRecord";
 import { TestType } from "./TestType";
 
 @Index("labtest_pkey", ["id"], { unique: true })
-@Entity("labtest", { schema: "public" })
+@Entity("labtest", { schema: "lab" })
 export class Labtest {
   @PrimaryGeneratedColumn({ type: "integer", name: "id" })
   id!: number;

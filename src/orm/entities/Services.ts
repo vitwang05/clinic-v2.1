@@ -10,7 +10,7 @@ import {
 import { AppointmentServices } from './AppointmentService';
   
   @Index("service_pkey", ["id"], { unique: true })
-  @Entity('services',{ schema: "public" })
+  @Entity('services',{ schema: "service" })
   export class Services {
     @PrimaryGeneratedColumn({ type: "integer", name: "id" })
     id: number;

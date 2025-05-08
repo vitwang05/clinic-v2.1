@@ -16,7 +16,7 @@ import { Roles } from "./Roles";
 @Index("users_email_key", ["email"], { unique: true })
 @Index("users_pkey", ["id"], { unique: true })
 @Index("users_phone_number_key", ["phoneNumber"], { unique: true })
-@Entity("users", { schema: "public" })
+@Entity("users", { schema: "auth" })
 export class Users {
   @PrimaryGeneratedColumn({ type: "integer", name: "id" })
   id!: number;

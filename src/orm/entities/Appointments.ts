@@ -16,7 +16,7 @@ import { Transactions } from "./Transactions";
 import { AppointmentServices } from "./AppointmentService";
 
 @Index("appointments_pkey", ["id"], { unique: true })
-@Entity("appointments")
+@Entity("appointments", {schema: "appointment"})
 export class Appointments {
   @PrimaryGeneratedColumn({ type: "integer", name: "id" })
   id!: number;

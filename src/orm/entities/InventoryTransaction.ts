@@ -9,7 +9,7 @@ import {
   
   export type InventoryTransactionType = "import" | "export";
   
-  @Entity("inventory_transaction", { schema: "public" })
+  @Entity("inventory_transaction", { schema: "inventory" })
   export class InventoryTransaction {
     @PrimaryGeneratedColumn({ type: "integer", name: "id" })
     id!: number;

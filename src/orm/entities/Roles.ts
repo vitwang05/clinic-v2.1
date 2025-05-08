@@ -8,7 +8,7 @@ import {
 import { Users } from "./Users";
 
 @Index("roles_pkey", ["id"], { unique: true })
-@Entity("roles", { schema: "public" })
+@Entity("roles", { schema: "auth" })
 export class Roles {
   @PrimaryGeneratedColumn({ type: "integer", name: "id" })
   id!: number;
