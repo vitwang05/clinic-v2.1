@@ -15,7 +15,7 @@ export class AppointmentController {
                 dto.isWalkIn = true;
             }
             console.log(dto);
-            const appointment = await this.appointmentService.createAppointment(dto);
+            const appointment = await this.appointmentService.createAppointment(dto, (req as any).user?.id);
             res.status(201).json(ApiResponse.success(appointment));
         } catch (error) {
             res.status(400).json(ApiResponse.error(error.message));

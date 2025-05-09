@@ -64,7 +64,7 @@ export class CommonRepository<T extends ObjectLiteral> {
   }
   async findWithCondition(
     condition: FindOptionsWhere<T>,
-    relations: string[] = []
+    relations: string[] = [],
   ): Promise<T[]> {
     return this.repository.find({ where: condition, relations });
   }

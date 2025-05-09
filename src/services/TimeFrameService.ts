@@ -34,10 +34,11 @@ export class TimeFrameService {
     }
 
     async createTimeFrame(timeFrameDTO: CreateTimeFrameDTO): Promise<TimeFrame> {
-        const existingTimeFrame = await this.timeFrameRepository.findOne({ timeFrameName: timeFrameDTO.timeFrameName } as any);
-        if (existingTimeFrame) {
-            throw new BadRequestException('Time frame name already exists');
-        }
+        // const existingTimeFrame = await this.timeFrameRepository.findOne({ timeFrameName: timeFrameDTO.timeFrameName });
+        // if (existingTimeFrame) {
+        //     throw new BadRequestException('Time frame name already exists');
+        // }
+        
         return this.timeFrameRepository.save(timeFrameDTO as TimeFrame);
     }
 

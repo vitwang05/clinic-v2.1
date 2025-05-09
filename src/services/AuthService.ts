@@ -41,7 +41,7 @@ export class AuthService {
         if (userData.password) {
             userData.password = await bcrypt.hash(userData.password, 10);
         }
-     
+        console.log(userData.roleId);
         return this.usersService.createUserForEmployee(userData as Users, userData.roleId, userData.employeeId);
         
     }

@@ -22,8 +22,8 @@ export class CreateAppointmentDTO {
     patientId!: number;
 
     @IsNumber()
-    @IsNotEmpty({ message: 'ID khung giờ không được để trống' })
-    timeFrameId!: number;
+    @IsOptional()
+    timeFrameId?: number | null;
 
     @IsDateString()
     @IsNotEmpty({ message: 'Ngày khám không được để trống' })

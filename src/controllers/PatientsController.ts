@@ -8,7 +8,7 @@ export class PatientsController {
     constructor(private patientsService: PatientsService) {}
 
     async getAllPatients(req: Request, res: Response): Promise<void> {
-        if ((req as any).user?.role.name !== 'admin') {
+        if ((req as any).user?.role.name === 'patient') {
             const patients = await this.patientsService.getPatientsByUserId((req as any).user?.userId);
             res.status(200).json(ApiResponse.success(patients));    
         } else {

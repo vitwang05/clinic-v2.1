@@ -28,7 +28,7 @@ const initializeRouter = async () => {
     router.delete('/:id', roleMiddleware(['admin', 'patient']), (req, res) => patientsController.deletePatient(req, res));
 
     // All authenticated users can view patients
-    router.get('/', roleMiddleware(['admin']), (req, res) => patientsController.getAllPatients(req, res));
+    router.get('/', roleMiddleware(['admin','patient','receptionist']), (req, res) => patientsController.getAllPatients(req, res));
     router.get('/:id', roleMiddleware(['admin']), (req, res) => patientsController.getPatientById(req, res));
     router.get('/search/cccd', roleMiddleware(['admin']), (req, res) => patientsController.findByCCCD(req, res));
     router.get('/search/phone', roleMiddleware(['admin']), (req, res) => patientsController.findByPhoneNumber(req, res));

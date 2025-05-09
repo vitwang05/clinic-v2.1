@@ -13,7 +13,8 @@ export class RegisterDTO {
 
     @IsString()
     @Matches(/^[0-9]{10,11}$/, { message: 'Số điện thoại không hợp lệ' })
-    phoneNumber: string;
+    @IsOptional()
+    phoneNumber?: string;
 
     @IsNumber()
     @IsOptional()

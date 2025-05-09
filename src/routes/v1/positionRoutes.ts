@@ -7,14 +7,15 @@ import { AppDataSource } from '../../orm/dbCreateConnection';
 import { authMiddleware, roleMiddleware } from '../../middlewares/auth.middleware';
 import { validateDTO } from '../../middlewares/validation.middleware';
 import { CreatePositionDTO, UpdatePositionDTO } from '../../dtos/position/position.dto';    
-
+import { DepartmentsRepository } from '../../repositories/DepartmentsRepository';
 const router = Router();
 
 const initializeRouter = async () => {
     const dataSource: DataSource = await AppDataSource.initialize(); // Ensure DB connection is established
 
     const positionsRepository = new PositionsRepository(dataSource);
-    const positionsService = new PositionsService(positionsRepository);
+    const departmentsRepository = new DepartmentsRepository(dataSource);
+    const positionsService = new PositionsService(positionsRepository, departmentsRepository);
     const positionsController = new PositionsController(positionsService);
 
     // Apply auth middleware to all routes

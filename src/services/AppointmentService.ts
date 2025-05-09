@@ -101,7 +101,7 @@ export class AppointmentService {
     await repo.save(appointmentServices);
   }
 
-  async createAppointment(dto: CreateAppointmentDTO): Promise<Appointments> {
+  async createAppointment(dto: CreateAppointmentDTO, userId: number|null): Promise<Appointments> {
     const repo = this.dataSource.getRepository(Appointments);
 
     const doctor = await this.checkDoctorExists(dto.doctorId);
@@ -111,14 +111,16 @@ export class AppointmentService {
     const patient = await this.checkPatientExists(dto.patientId);
     console.log(patient);
     if (!patient) throw new Error("Bệnh nhân không tồn tại");
-
-    const timeFrame = await this.checkTimeFrameExists(
-      dto.timeFrameId,
-      dto.doctorId,
-      dto.date
-    );
-    console.log(timeFrame);
-    if (!timeFrame) throw new Error("Khung giờ không tồn tại");
+    if(userId && patient?.user?.id !== userId) throw new Error("Bạn không có quyền tạo lịch hẹn cho bệnh nhân này");
+    let timeFrame: TimeFrame | null = null;
+    if(dto.timeFrameId) {
+      timeFrame = await this.checkTimeFrameExists(
+        dto.timeFrameId,
+        dto.doctorId,
+        dto.date
+      );
+      if (!timeFrame) throw new Error("Khung giờ không tồn tại");
+    }
 
     if (dto.date < new Date().toISOString().split("T")[0])
       throw new Error("Ngày khám không được trong quá khứ");

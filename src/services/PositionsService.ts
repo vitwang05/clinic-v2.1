@@ -4,14 +4,18 @@ import { DataSource } from 'typeorm';
 import { AppDataSource } from '../orm/dbCreateConnection';
 import { CreatePositionDTO } from '../dtos/position/position.dto';
 import { UpdatePositionDTO } from '../dtos/position/position.dto';
+import { NotFoundException } from '../exceptions';
+import { DepartmentsRepository } from '../repositories/DepartmentsRepository';
 
 export class PositionsService {
     private positionsRepository: PositionsRepository;
     private dataSource: DataSource | null = null;
     private initializationPromise: Promise<void>;
+    private departmentsRepository: DepartmentsRepository;
 
-    constructor(positionsRepository: PositionsRepository) {
+    constructor(positionsRepository: PositionsRepository, departmentsRepository: DepartmentsRepository) {
         this.positionsRepository = positionsRepository;
+        this.departmentsRepository = departmentsRepository;
         // this.initializationPromise = this.initializeDataSource();
     }
 
@@ -44,8 +48,17 @@ export class PositionsService {
 
     async updatePosition(id: number, positionDTO: UpdatePositionDTO): Promise<Positions | null> {
         // await this.ensureInitialized();
+        const department = await this.departmentsRepository.findOne(positionDTO.departmentId);
+        if (!department) {
+            throw new NotFoundException('Department not found');
+        }
+        const position = await this.positionsRepository.findOne(id);
+        if (!position) {
+            throw new NotFoundException('Position not found');
+        }
+        position.department = department;
         // const positionRepository = this.dataSource!.getRepository(Positions);
-        await this.positionsRepository.update(id, positionDTO);
+        await this.positionsRepository.update(id, position);
         // return positionRepository.findOne({
         //     where: { id },
         //     relations: ['department']
