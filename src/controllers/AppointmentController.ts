@@ -57,9 +57,15 @@ export class AppointmentController {
 
     async getDoctorAppointments(req: Request, res: Response): Promise<void> {
         try {
+            let userId = null;
             const doctorId = Number(req.params.doctorId);
+            if((req as any).user?.role.name === 'doctor') {
+                userId = (req as any).user?.userId;
+            }
+            console.log((req as any).user?.role.name);
+            console.log((req as any).user?.userId);
             const date = req.params.date;
-            const appointments = await this.appointmentService.getDoctorAppointments(doctorId, date);
+            const appointments = await this.appointmentService.getDoctorAppointments(doctorId, date, userId);
             res.status(200).json(ApiResponse.success(appointments));
         } catch (error) {
             res.status(500).json(ApiResponse.error(error.message));

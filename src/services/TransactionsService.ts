@@ -9,6 +9,7 @@ import { Labtest } from '../orm/entities/Labtest';
 import { MedicalRecord } from '../orm/entities/MedicalRecord';
 import { AppointmentStatus } from '../dtos/appointment/appointment.dto';
 import { Users } from '../orm/entities/Users';
+import { AppointmentServices } from '../orm/entities/AppointmentService';
 export class TransactionsService {
     constructor(
         private readonly dataSource: DataSource // Inject AppDataSource ở ngoài
@@ -44,7 +45,7 @@ export class TransactionsService {
         }
         if(transactionData.appointmentId){
             const repo = this.dataSource.getRepository(Appointments);
-            const appointment = await repo.findOne({ where: { id: transactionData.appointmentId }, relations: ['patient', 'patient.user'], });
+            const appointment = await repo.findOne({ where: { id: transactionData.appointmentId }, relations: ['patient', 'patient.user'] });
           
             const userRepo = this.dataSource.getRepository(Users);
             if (!appointment) {
@@ -65,12 +66,17 @@ export class TransactionsService {
 
             const labtest = await this.dataSource.getRepository(Labtest).find({ where: { medicalRecord: { id: medicalRecord.id }}, relations: ['testType'] });
    
-            if (labtest.length === 0) {
-                throw new NotFoundException('Lab test not found');
+            if (labtest.length) {
+                for (const test of labtest) {
+                    if(test.testType){
+                        totalMoney += Number(test.testType.price);
+                    }
+                }
             }
-            for (const test of labtest) {
-                if(test.testType){
-                    totalMoney += Number(test.testType.price);
+            const services = await this.dataSource.getRepository(AppointmentServices).find({ where: { appointment: { id: appointment.id }}, relations: ['service'] });
+            if (services.length) {
+                for (const service of services) {
+                    totalMoney += Number(service.service.price);
                 }
             }
             transactionData.prescriptionId = null;

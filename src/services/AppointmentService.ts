@@ -279,10 +279,22 @@ export class AppointmentService {
 
   async getDoctorAppointments(
     doctorId: number,
-    date: string
+    date: string,
+    userId: number | null
   ): Promise<Appointments[]> {
     const repo = this.dataSource.getRepository(Appointments);
-
+    if(userId) {
+      console.log("run");
+      const doctor = await this.dataSource.getRepository(Employees).findOne({
+        where: {
+          user: {
+            id: userId,
+          },
+        },
+      });
+      console.log(doctor);
+      doctorId = doctor?.id;
+    }
     const today = new Date();
     const inputDate = new Date(date);
 
