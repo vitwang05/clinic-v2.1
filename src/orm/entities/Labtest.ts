@@ -16,8 +16,8 @@ export class Labtest {
   @PrimaryGeneratedColumn({ type: "integer", name: "id" })
   id!: number;
 
-  @Column("character varying", { name: "result", nullable: true })
-  result!: string | null;
+  @Column("jsonb", { name: "result", nullable: true })
+  result!: LabTestResult  | null;
 
   @Column("timestamp without time zone", {
     name: "created_at",
@@ -44,4 +44,13 @@ export class Labtest {
   @ManyToOne(() => TestType, (testType) => testType.labtests)
   @JoinColumn([{ name: "test_type_id", referencedColumnName: "id" }])
   testType!: TestType;
+}
+
+export interface LabTestResult {
+  [key: string]: {
+    value: number;
+    unit: string;
+    reference: string;
+    note?: string;
+  };
 }

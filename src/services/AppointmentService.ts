@@ -1,4 +1,4 @@
-import { DataSource, In } from "typeorm";
+import { DataSource, In, IsNull, Not } from "typeorm";
 import { Appointments } from "../orm/entities/Appointments";
 import { Employees } from "../orm/entities/Employees";
 import { Patients } from "../orm/entities/Patients";
@@ -348,5 +348,101 @@ export class AppointmentService {
     const queueNumber = appointments.length + 1;
 
     return queueNumber;
+  }
+
+  async getAppointmentStatistics(): Promise<{
+    statusSummary: { label: string; value: number }[];
+    hourlyTraffic: { label: string; value: number }[];
+    weekdayTraffic: { label: string; value: number }[];
+    avgDurations: { label: string; value: number }[]; 
+  }> {
+    const repo = this.dataSource.getRepository(Appointments);
+  
+    const appointments = await repo.find({
+      where: { checkInTime: Not(IsNull()) },
+      select: ['status', 'checkInTime', 'calledInTime', 'startTime', 'endTime'],
+    });
+  
+    // --- 1. Thống kê trạng thái
+    const statusCount: Record<string, number> = {};
+    for (const a of appointments) {
+      statusCount[a.status] = (statusCount[a.status] || 0) + 1;
+    }
+  
+    const statusSummary = Object.entries(statusCount).map(([label, value]) => ({ label, value }));
+  
+    // --- 2. Thống kê số lượng theo giờ trong ngày
+    const hourlyTraffic: Record<string, number> = {};
+    for (let h = 0; h < 24; h++) {
+      hourlyTraffic[`${h.toString().padStart(2, '0')}:00`] = 0;
+    }
+  
+    // --- 3. Thống kê theo thứ trong tuần
+    const weekdayTraffic: Record<string, number> = {
+      Monday: 0,
+      Tuesday: 0,
+      Wednesday: 0,
+      Thursday: 0,
+      Friday: 0,
+      Saturday: 0,
+      Sunday: 0,
+    };
+  
+    // --- 4. Tính thời lượng trung bình giữa các trạng thái
+    let totalCheckInToCalled = 0;
+    let countCheckInToCalled = 0;
+  
+    let totalCalledToStart = 0;
+    let countCalledToStart = 0;
+  
+    let totalStartToEnd = 0;
+    let countStartToEnd = 0;
+  
+    for (const a of appointments) {
+      const d = new Date(a.checkInTime);
+      const hour = `${d.getHours().toString().padStart(2, '0')}:00`;
+      const day = d.toLocaleString("en-US", { weekday: "long" });
+  
+      hourlyTraffic[hour]++;
+      weekdayTraffic[day]++;
+  
+      if (a.checkInTime && a.startTime) {
+        totalCheckInToCalled += (a.startTime.getTime() - a.checkInTime.getTime()) / 60000;
+        countCheckInToCalled++;
+      }
+  
+      if (a.calledInTime && a.startTime) {
+        totalCalledToStart += (a.calledInTime.getTime() - a.startTime.getTime()) / 60000;
+        countCalledToStart++;
+      }
+  
+      if (a.calledInTime && a.endTime) {
+        totalStartToEnd += (a.endTime.getTime() - a.calledInTime.getTime()) / 60000;
+        countStartToEnd++;
+      }
+    }
+  
+    const convertToArray = (obj: Record<string, number>) =>
+      Object.entries(obj).map(([label, value]) => ({ label, value }));
+  
+    return {
+      statusSummary,
+      hourlyTraffic: convertToArray(hourlyTraffic),
+      weekdayTraffic: convertToArray(weekdayTraffic),
+      avgDurations: [
+        {
+          label: "Thời gian từ check-in đến chờ gọi",
+          value: countCheckInToCalled ? +(totalCheckInToCalled / countCheckInToCalled).toFixed(2) : 0
+        },
+        {
+          label: "Thời gian chờ được gọi",
+          value: countCalledToStart ? +(totalCalledToStart / countCalledToStart).toFixed(2) : 0
+        },
+        {
+          label: "Thời gian khám",
+          value: countStartToEnd ? +(totalStartToEnd / countStartToEnd).toFixed(2) : 0
+        }
+      ]
+    };
   }
 }

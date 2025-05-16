@@ -1,4 +1,5 @@
-import { IsString, IsOptional, IsNumber, IsNotEmpty } from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsNotEmpty, IsObject } from 'class-validator';
+import { LabTestResult } from '../../orm/entities/Labtest';
 
 export class CreateLabtestDTO {
     @IsNumber()
@@ -12,10 +13,6 @@ export class CreateLabtestDTO {
     @IsNumber()
     @IsNotEmpty({ message: 'Test Type ID is required' })
     testTypeId: number;
-
-    @IsString()
-    @IsOptional()
-    result?: string;
 }
 
 export class UpdateLabtestDTO {
@@ -31,7 +28,7 @@ export class UpdateLabtestDTO {
     @IsOptional()
     testTypeId?: number;
 
-    @IsString()
+    @IsObject()
     @IsOptional()
-    result?: string;
+    result?: LabTestResult;
 }

@@ -22,10 +22,10 @@ export class TestTypeService {
     }
 
     async createTestType(testTypeData: Partial<TestType>): Promise<TestType> {
-        const existingTestType = await this.testTypeRepository.findOne({ name: testTypeData.name } as any);
-        if (existingTestType) {
-            throw new BadRequestException('Test type name already exists');
-        }
+        // const existingTestType = await this.testTypeRepository.findOne({ name: testTypeData.name } as any);
+        // if (existingTestType) {
+        //     throw new BadRequestException('Test type name already exists');
+        // }
         return this.testTypeRepository.save(testTypeData as TestType);
     }
 

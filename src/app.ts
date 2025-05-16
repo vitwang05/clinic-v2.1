@@ -23,6 +23,7 @@ import transactionRoutes from "./routes/v1/transactionRoutes";
 import labtestRoutes from "./routes/v1/labtestRoutes";
 import testTypeRoutes from "./routes/v1/testTypeRoutes";
 import serviceRoutes from "./routes/v1/serviceRoutes";
+import medicalRecordRoutes from "./routes/v1/medicalRecordRoutes";
 dotenv.config();
 
 const app = express();
@@ -52,6 +53,7 @@ app.use('/api/v1/labtests', labtestRoutes);
 app.use('/api/v1/test-types', testTypeRoutes);
 app.use('/api/v1/transactions', transactionRoutes);
 app.use('/api/v1/services', serviceRoutes);
+app.use('/api/v1/medical-records', medicalRecordRoutes);
 app.use(errorMiddleware);
 
 // Initialize database connection

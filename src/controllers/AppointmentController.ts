@@ -81,4 +81,14 @@ export class AppointmentController {
             res.status(500).json(ApiResponse.error(error.message));
         }
     }
+
+    async getAppointmentStatistics(req: Request, res: Response): Promise<void> {
+        try {
+            const statistics = await this.appointmentService.getAppointmentStatistics();
+            res.status(200).json(ApiResponse.success(statistics));
+        } catch (error) {
+            res.status(500).json(ApiResponse.error(error.message));
+        }
+    }
+    
 } 

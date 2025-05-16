@@ -25,6 +25,7 @@ const initializeRouter = async () => {
     router.put('/:id', roleMiddleware(['admin','receptionist']), validateDTO(UpdateAppointmentDTO), (req, res) => appointmentController.updateAppointment(req, res));
     router.get('/doctor/:doctorId/:date',roleMiddleware(['admin', 'doctor', 'receptionist']), (req, res)=> appointmentController.getDoctorAppointments(req,res));
     router.get('/patienAppointment/:patientId', (req, res)=> appointmentController.getPatientAppointments(req,res));
+    router.get('/statistics', roleMiddleware(['admin']), (req, res)=> appointmentController.getAppointmentStatistics(req,res));
     // All authenticated users can view appointments
     router.get('/:id', (req, res) => appointmentController.getAppointmentById(req, res));
 };
